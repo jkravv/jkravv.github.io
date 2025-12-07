@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Χριστουγεννιάτικο Escape Room</title>
+    <style>
+        body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);color:#fff;text-align:center;margin:0;padding:20px;min-height:100vh}
+        h1{font-size:3.2em;text-shadow:0 0 20px #ffd700;margin-bottom:10px}
+        .subtitle{font-size:1.5em;margin-bottom:30px;color:#ffddaa}
+        .letters{font-size:4.5em;letter-spacing:18px;margin:50px 0;color:#ffd700;text-shadow:0 0 15px #fff}
+        .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;max-width:950px;margin:0 auto 60px;transition:all 1.5s}
+        .box{background:linear-gradient(135deg,#c41f1f,#ff0a0a);border:6px solid #ffd700;border-radius:25px;padding:50px;font-size:3.8em;font-weight:bold;cursor:pointer;transition:all .4s;box-shadow:0 15px 30px rgba(0,0,0,.7)}
+        .box:hover{transform:translateY(-15px) scale(1.1);box-shadow:0 0 40px #ffd700}
+        .box.solved{background:#0d6e0d;opacity:.55;cursor:not-allowed;transform:scale(.9)}
+        .box.win{grid-column:1/4;background:linear-gradient(45deg,#ffd700,#ff6b6b,#ff1493,#ffd700);background-size:400%;animation:rainbow 8s linear infinite,pulse 2s infinite;font-size:3em;padding:70px;border:8px solid #fff}
+        @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+        @keyframes rainbow{0%{background-position:0% 50%}100%{background-position:100% 50%}}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.95);justify-content:center;align-items:center;z-index:100}
+        .modal-content{background:#001a00;padding:50px;border-radius:30px;max-width:850px;border:6px solid #ffd700;box-shadow:0 0 40px #ffd700}
+        .close{font-size:3em;cursor:pointer;color:#ff6b6b;float:right}
+        input{padding:18px;font-size:1.6em;width:340px;margin:20px;border-radius:10px}
+        button{padding:18px 45px;font-size:1.6em;background:#c41f1f;color:white;border:none;border-radius:15px;cursor:pointer}
+        button:hover{background:#ff0a0a}
+    </style>
+</head>
+<body>
+    <h1>🎄 Χριστουγεννιάτικο Escape Room 🎄</h1>
+    <p class="subtitle">Λύσε τους 9 γρίφους της ελληνικής παράδοσης και βρες τη μαγική λέξη που φωτίζει τα Χριστούγεννα!</p>
+    <div class="letters" id="letters">---------</div>
+<h3>Δώσε τις απαντήσεις σου με μικρά γράμματα και μην ξεχάσεις να βάλεις τόνους</h3>
+<br>
+    <div class="grid" id="grid">
+        <div class="box" data-num="1">1</div>
+        <div class="box" data-num="2">2</div>
+        <div class="box" data-num="3">3</div>
+        <div class="box" data-num="4">4</div>
+        <div class="box" data-num="5">5</div>
+        <div class="box" data-num="6">6</div>
+        <div class="box" data-num="7">7</div>
+        <div class="box" data-num="8">8</div>
+        <div class="box" data-num="9">9</div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="title" style="font-size:2.8em;color:#ffd700;"></h2>
+            <div id="riddle" style="font-size:1.9em;line-height:2.2;margin:40px;"></div>
+            <div style="color:#ffdd00;font-style:italic;font-size:1.3em;">Υπόδειξη: <span id="hint"></span></div>
+            <input type="text" id="ans" placeholder="Η απάντησή σου..." autocomplete="off">
+            <br><button onclick="checkAnswer()">Υποβολή</button>
+            <p id="msg" style="font-size:2em;margin-top:30px;"></p>
+        </div>
+    </div>
+
+    <script>
+        const puzzles = {
+            1: {title:"Γρίφος 1 – Τα τραγούδια", riddle:"Από πόρτα σε πόρτα γυρνάμε,<br>τραγουδάμε «Καλήν εσπέραν άρχοντες»<br>και μαζεύουμε γλυκά και λεφτά!", hint:"Τα χριστουγεννιάτικα τραγούδια", answer:"κάλαντα", letter:"Λ"},
+            2: {title:"Γρίφος 2 – Το γλυκό με μέλι", riddle:"Μέλι, καρύδια και ζύμη,<br>κολλάνε στα χέρια γλυκά.<br>Χριστούγεννα χωρίς αυτά δεν γίνεται!", hint:"Το αγαπημένο γλυκό με μέλι", answer:"μελομακάρονα", letter:"Α"},
+            3: {title:"Γρίφος 3 – Το άσπρο γλυκό", riddle:"Ζάχαρη άχνη σαν χιόνι,<br>πάνω σε στρογγυλή ζύμη.<br>Μυρίζει βούτυρο και κανέλα!", hint:"Το γλυκό που είναι σαν χιονισμένο", answer:"κουραμπιέδες", letter:"Μ"},
+            4: {title:"Γρίφος 4 – Ο γενειοφόρος", riddle:"Με κόκκινα ρούχα και άσπρα γένια,<br>από την καμινάδα μπαίνει κρυφά<br>και φέρνει δώρα στα παιδιά!", hint:"Ο Άγιος των Χριστουγέννων", answer:"άγιος βασίλης", letter:"Π"},
+            5: {title:"Γρίφος 5 – Η τούρτα της Πρωτοχρονιάς", riddle:"Την κόβουμε την Πρωτοχρονιά,<br>έχει φλουρί κρυμμένο μέσα.<br>Όποιος το βρει έχει γούρι όλο τον χρόνο!", hint:"Η πίτα με το φλουρί", answer:"βασιλόπιτα", letter:"Ι"},
+            6: {title:"Γρίφος 6 – Οι σκανταλιάρηδες", riddle:"Από τα Χριστούγεννα μέχρι τα Φώτα,<br>βγαίνουν από τη γη και κάνουν ζημιές.<br>Φοβούνται τον αγιασμό!", hint:"Οι κακοί της ελληνικής παράδοσης", answer:"καλικάντζαροι", letter:"Ο"},
+            7: {title:"Γρίφος 7 – Το σκαφάκι", riddle:"Μικρό καραβάκι στολίζουμε,<br>αντί για δέντρο σε πολλά σπίτια.<br>Σύμβολο της ναυτικής μας παράδοσης!", hint:"Το ελληνικό χριστουγεννιάτικο δέντρο", answer:"καράβι", letter:"Ν"},
+            8: {title:"Γρίφος 8 – Το φως στο εικονοστάσι", riddle:"Στο εικονοστάσι αναμμένο μένει,<br>με λάδι και φιτίλι καίει όλη νύχτα<br>τιμώντας τον Χριστό και τον Άγιο Βασίλη.", hint:"Το μικρό λαμπαδάκι της προσευχής", answer:"καντήλι", letter:"Ι"},
+            9: {title:"Γρίφος 9 – Τα φωτάκια", riddle:"Μικρά και χρωματιστά,<br>στολίζουν το δέντρο ή το καραβάκι.<br>Είναι η μαγική λέξη που ψάχνουμε!", hint:"Τα χριστουγεννιάτικα φωτάκια", answer:"λαμπιόνια", letter:"Α"}
+        };
+
+        let solved = JSON.parse(localStorage.getItem("ellinika_xmas_kids_2025") || "{}");
+        let currentPuzzle = null;
+
+        function normalize(str) {
+            return str.toLowerCase()
+                      .replace(/[άα]/g,'α')
+                      .replace(/[έε]/g,'ε')
+                      .replace(/[ήη]/g,'η')
+                      .replace(/[ίϊΐι]/g,'ι')
+                      .replace(/[όο]/g,'ο')
+                      .replace(/[ύϋΰυ]/g,'υ')
+                      .replace(/[ώω]/g,'ω')
+                      .replace(/ς/g,'σ')
+                      .replace(/[^α-ω]/g,'')
+                      .trim();
+        }
+
+        function updateLetters() {
+            let str = "";
+            for(let i=1; i<=9; i++) str += solved[i] || "-";
+            document.getElementById("letters").textContent = str;
+
+            if(Object.keys(solved).length === 9) {
+                document.getElementById("grid").style.opacity = "0";
+                setTimeout(() => {
+                    document.getElementById("grid").innerHTML = 
+                        '<div class="box win">🎉 ΜΠΡΑΒΟ ΠΑΙΔΙΑ! 🎉<br><br>Η μαγική λέξη είναι:<br><br><span style="font-size:2.2em;letter-spacing:20px;">Λ Α Μ Π Ι Ο Ν Ι Α</span><br><br>Φωτίσατε τα Χριστούγεννα!<br>Καλά Χριστούγεννα & Καλή Χρονιά! 🎄✨</div>';
+                    document.getElementById("grid").style.opacity = "1";
+                }, 1200);
+                localStorage.removeItem("ellinika_xmas_kids_2025");
+            }
+        }
+
+        function openPuzzle(num) {
+            if(solved[num]) return;
+            currentPuzzle = num;
+            const p = puzzles[num];
+            document.getElementById("title").innerHTML = p.title;
+            document.getElementById("riddle").innerHTML = p.riddle;
+            document.getElementById("hint").textContent = p.hint;
+            document.getElementById("ans").value = "";
+            document.getElementById("msg").innerHTML = "";
+            document.getElementById("modal").style.display = "flex";
+            setTimeout(() => document.getElementById("ans").focus(), 300);
+        }
+
+        function closeModal() {
+            document.getElementById("modal").style.display = "none";
+        }
+
+        function checkAnswer() {
+            if (!currentPuzzle) return;
+            const input = normalize(document.getElementById("ans").value);
+            const correct = normalize(puzzles[currentPuzzle].answer);
+
+            if (input === correct) {
+                solved[currentPuzzle] = puzzles[currentPuzzle].letter;
+                localStorage.setItem("ellinika_xmas_kids_2025", JSON.stringify(solved));
+                document.getElementById("msg").innerHTML = `<h2 style="color:#ffd700">ΣΩΣΤΑ! 🎉<br>Πήρες το γράμμα: <b>${puzzles[currentPuzzle].letter}</b></h2>`;
+                document.querySelector(`.box[data-num="${currentPuzzle}"]`).classList.add("solved");
+                setTimeout(() => { closeModal(); updateLetters(); }, 3000);
+            } else {
+                document.getElementById("msg").innerHTML = "<h2 style='color:#ff6b6b'>Λάθος! Δοκίμασε ξανά...</h2>";
+            }
+        }
+
+        document.querySelectorAll(".box").forEach(box => {
+            const num = box.dataset.num;
+            box.addEventListener("click", () => openPuzzle(num));
+            if(solved[num]) box.classList.add("solved");
+        });
+        updateLetters();
+
+        window.addEventListener("click", e => { if(e.target === document.getElementById("modal")) closeModal(); });
+        document.addEventListener("keydown", e => { if(e.key === "Escape") closeModal(); });
+        document.getElementById("ans").addEventListener("keypress", e => { if(e.key === "Enter") checkAnswer(); });
+    </script>
+	
+</body>
+</html>
