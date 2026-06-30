@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Χριστουγεννιάτικη Ιστορία — Η Αποστολή του Σκρουτζ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night-1:#0a1633;
+    --night-2:#0b1020;
+    --ink:#10131c;
+    --gold:#f2c14e;
+    --gold-bright:#ffd56b;
+    --gold-deep:#c9962f;
+    --cream:#f6ecd4;
+    --cream-dim:#cab98f;
+    --berry:#c8455a;
+    --berry-deep:#9e2f44;
+    --holly:#3a9b6e;
+    --holly-deep:#2c7c57;
+    --ghost:#8fd3d8;
+    --accent:var(--gold);           /* shifts per chapter */
+    --fs:1.34rem;                    /* reader font size, adjustable */
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Alegreya", Georgia, "Times New Roman", serif;
+    color:var(--cream);
+    min-height:100vh;
+    background:
+      radial-gradient(1200px 700px at 50% -10%, rgba(242,193,78,.10), transparent 60%),
+      radial-gradient(900px 600px at 80% 110%, rgba(58,155,110,.08), transparent 60%),
+      linear-gradient(160deg, var(--night-1) 0%, var(--night-2) 55%, var(--ink) 100%);
+    background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.78;
+  }
+
+  /* ---------- ambient snow ---------- */
+  .snow{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+  .flake{position:absolute;top:-5vh;color:rgba(255,255,255,.55);
+    animation:fall linear infinite;text-shadow:0 0 6px rgba(255,255,255,.4);}
+  @keyframes fall{to{transform:translateY(110vh) rotate(220deg);}}
+  @media (prefers-reduced-motion: reduce){
+    .snow{display:none;}
+    *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+  }
+
+  /* ---------- shell ---------- */
+  .wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:18px 20px 80px;}
+
+  /* ---------- top bar ---------- */
+  .topbar{display:flex;align-items:center;gap:14px;
+    padding:14px 0 10px;position:sticky;top:0;z-index:5;
+    background:linear-gradient(180deg, rgba(10,16,32,.92) 60%, rgba(10,16,32,0));
+    backdrop-filter:blur(3px);}
+  .heart-meter{flex:1;min-width:0;}
+  .heart-meter .label{display:flex;justify-content:space-between;align-items:center;
+    font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--cream-dim);margin-bottom:6px;font-weight:700;}
+  .heart-meter .label b{color:var(--gold-bright);font-size:.92rem;letter-spacing:.02em;}
+  .track{height:14px;border-radius:30px;background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.12);overflow:hidden;position:relative;}
+  .fill{height:100%;width:0%;border-radius:30px;
+    background:linear-gradient(90deg,#2d4a8a 0%, var(--gold-deep) 45%, var(--gold-bright) 100%);
+    box-shadow:0 0 14px rgba(242,193,78,.55);transition:width .9s cubic-bezier(.2,.8,.2,1);}
+  .toolbtns{display:flex;gap:8px;}
+  .iconbtn{font-family:"Alegreya",serif;border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.05);color:var(--cream);border-radius:10px;
+    width:40px;height:40px;font-size:1.05rem;cursor:pointer;line-height:1;
+    display:flex;align-items:center;justify-content:center;font-weight:700;}
+  .iconbtn:hover{background:rgba(242,193,78,.16);border-color:var(--gold);}
+  .iconbtn:focus-visible{outline:3px solid var(--gold-bright);outline-offset:2px;}
+
+  /* ---------- ornaments ---------- */
+  .orn{display:block;margin:18px auto;width:120px;opacity:.9;color:var(--accent);}
+
+  /* ---------- start screen ---------- */
+  .hero{text-align:center;padding:26px 6px 6px;}
+  .eyebrow{font-size:.8rem;letter-spacing:.34em;text-transform:uppercase;
+    color:var(--cream-dim);font-weight:700;}
+  .hero h1{font-family:"Playfair Display",serif;font-weight:800;
+    font-size:clamp(2.3rem,8vw,3.7rem);line-height:1.05;margin:.25em 0 .1em;
+    color:var(--cream);text-shadow:0 2px 30px rgba(0,0,0,.5);}
+  .hero h1 .glow{color:var(--gold-bright);text-shadow:0 0 26px rgba(242,193,78,.5);}
+  .hero .author{font-style:italic;font-size:1.25rem;color:var(--cream-dim);margin-top:.1em;}
+  .hero .blurb{max-width:540px;margin:22px auto 0;font-size:1.2rem;}
+  .howto{max-width:560px;margin:22px auto 0;text-align:left;
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+    border-radius:16px;padding:18px 22px;}
+  .howto h3{font-family:"Playfair Display",serif;margin:.1em 0 .4em;color:var(--gold-bright);font-size:1.2rem;}
+  .howto ul{margin:0;padding-left:1.15em;}
+  .howto li{margin:.3em 0;font-size:1.05rem;}
+
+  /* ---------- chapter card ---------- */
+  .chapter-head{text-align:center;margin:8px 0 4px;}
+  .chapter-head .num{font-size:.78rem;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--cream-dim);font-weight:700;}
+  .chapter-head h2{font-family:"Playfair Display",serif;font-weight:800;
+    font-size:clamp(1.7rem,6vw,2.5rem);margin:.12em 0;color:var(--accent);
+    text-shadow:0 0 24px rgba(0,0,0,.4);}
+  .scene-icon{font-size:2.6rem;line-height:1;display:block;margin:6px auto 2px;
+    filter:drop-shadow(0 0 12px rgba(242,193,78,.35));}
+
+  .card{background:linear-gradient(180deg, rgba(20,26,46,.72), rgba(13,17,30,.82));
+    border:1px solid rgba(242,193,78,.22);border-radius:20px;
+    padding:26px 28px;margin-top:18px;
+    box-shadow:0 18px 50px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.05);}
+  .story{font-size:var(--fs);line-height:1.92;}
+  .story p{margin:0 0 .2em;}
+  .fade-in{animation:fadeIn .55s ease both;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+  .drop::first-letter{font-family:"Playfair Display",serif;font-weight:800;
+    font-size:3.3rem;line-height:.8;float:left;margin:.06em .12em 0 0;color:var(--gold-bright);}
+
+  /* ---------- buttons ---------- */
+  .actions{margin-top:22px;display:flex;flex-direction:column;gap:14px;}
+  .btn{font-family:"Alegreya",serif;font-weight:700;font-size:1.18rem;
+    border:none;border-radius:14px;padding:16px 22px;cursor:pointer;
+    color:#1a1206;background:linear-gradient(180deg,var(--gold-bright),var(--gold-deep));
+    box-shadow:0 8px 22px rgba(201,150,47,.4);transition:transform .12s ease, box-shadow .2s ease, filter .2s;
+    text-align:left;width:100%;line-height:1.35;}
+  .btn:hover{transform:translateY(-2px);filter:brightness(1.06);}
+  .btn:active{transform:translateY(0);}
+  .btn:focus-visible{outline:3px solid var(--cream);outline-offset:3px;}
+  .btn.center{text-align:center;}
+  .btn.choice{background:linear-gradient(180deg,#5b7fd6,#3151a3);color:#fff;
+    box-shadow:0 8px 22px rgba(49,81,163,.4);}
+  .btn.choice.tempt{background:linear-gradient(180deg,var(--holly),var(--holly-deep));
+    box-shadow:0 8px 22px rgba(44,124,87,.4);}
+  .btn.quiz{background:linear-gradient(180deg,#26314f,#1a2238);color:var(--cream);
+    border:1px solid rgba(242,193,78,.28);box-shadow:0 6px 18px rgba(0,0,0,.35);}
+  .btn.quiz:hover{border-color:var(--gold);background:linear-gradient(180deg,#2f3c5f,#212b45);}
+  .btn.quiz.wrong{animation:shake .4s;border-color:var(--berry);
+    background:linear-gradient(180deg,#5a2533,#43202b);}
+  .btn.quiz.right{border-color:var(--holly);background:linear-gradient(180deg,#235c45,#1c4636);color:#eafff4;}
+  .btn:disabled{cursor:default;opacity:.85;}
+  @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-7px);}
+    40%{transform:translateX(7px);}60%{transform:translateX(-5px);}80%{transform:translateX(5px);}}
+
+  .q{font-family:"Playfair Display",serif;font-size:1.34rem;font-weight:600;
+    color:var(--gold-bright);margin:6px 0 4px;line-height:1.4;}
+  .q .qtag{display:inline-block;font-family:"Alegreya",serif;font-size:.72rem;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--ghost);font-weight:700;
+    border:1px solid rgba(143,211,216,.4);border-radius:30px;padding:3px 12px;margin-bottom:10px;}
+
+  /* feedback bubbles */
+  .feedback{margin-top:14px;border-radius:14px;padding:14px 18px;font-size:1.08rem;
+    animation:fadeIn .35s ease both;}
+  .feedback.hint{background:rgba(200,69,90,.12);border:1px solid rgba(200,69,90,.45);color:#ffd9df;}
+  .feedback.win{background:rgba(58,155,110,.14);border:1px solid rgba(58,155,110,.5);color:#d7ffe9;}
+  .feedback .key{font-weight:700;color:var(--gold-bright);}
+
+  /* ---------- modal (the kindness trap) ---------- */
+  .overlay{position:fixed;inset:0;z-index:50;background:rgba(5,8,18,.78);
+    display:none;align-items:center;justify-content:center;padding:22px;
+    backdrop-filter:blur(4px);animation:fadeIn .3s ease both;}
+  .overlay.show{display:flex;}
+  .modal{max-width:480px;background:linear-gradient(180deg,#1a2138,#11152a);
+    border:1px solid var(--gold);border-radius:20px;padding:28px;text-align:center;
+    box-shadow:0 24px 60px rgba(0,0,0,.6);}
+  .modal .candle{font-size:2.4rem;}
+  .modal h3{font-family:"Playfair Display",serif;color:var(--gold-bright);
+    font-size:1.5rem;margin:.3em 0 .5em;}
+  .modal p{font-size:1.12rem;margin:.4em 0;}
+
+  /* ---------- end card ---------- */
+  .end-moral{background:rgba(242,193,78,.10);border:1px solid rgba(242,193,78,.4);
+    border-radius:16px;padding:20px 24px;margin-top:18px;font-size:1.16rem;}
+  .activity{background:rgba(58,155,110,.10);border:1px solid rgba(58,155,110,.45);
+    border-radius:16px;padding:18px 22px;margin-top:16px;}
+  .activity h3{font-family:"Playfair Display",serif;color:#bff4d9;margin:.1em 0 .4em;font-size:1.25rem;}
+  .activity ul{margin:.2em 0;padding-left:1.2em;}
+  .activity li{margin:.35em 0;font-size:1.06rem;}
+
+  .credit{text-align:center;color:var(--cream-dim);font-size:.92rem;margin-top:34px;
+    font-style:italic;}
+  .credit a{color:var(--gold);}
+
+  .hidden{display:none !important;}
+
+  @media (max-width:560px){
+    .card{padding:22px 18px;}
+    .btn{font-size:1.08rem;padding:15px 18px;}
+    .iconbtn{width:36px;height:36px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="snow" id="snow" aria-hidden="true"></div>
+
+<div class="wrap">
+
+  <!-- progress + tools (hidden on start) -->
+  <div class="topbar hidden" id="topbar">
+    <div class="heart-meter">
+      <div class="label"><span>Η καρδιά του Σκρουτζ</span><b id="pct">0%</b></div>
+      <div class="track"><div class="fill" id="fill"></div></div>
+    </div>
+    <div class="toolbtns">
+      <button class="iconbtn" id="smaller" title="Μικρότερα γράμματα" aria-label="Μικρότερα γράμματα">A−</button>
+      <button class="iconbtn" id="bigger" title="Μεγαλύτερα γράμματα" aria-label="Μεγαλύτερα γράμματα">A+</button>
+      <button class="iconbtn" id="restart" title="Από την αρχή" aria-label="Ξεκίνα από την αρχή">↺</button>
+    </div>
+  </div>
+
+  <!-- START SCREEN -->
+  <section id="start" class="hero">
+    <svg class="orn" viewBox="0 0 120 30" fill="none" stroke="currentColor" stroke-width="1.6">
+      <path d="M2 15 H44"/><path d="M118 15 H76"/>
+      <path d="M60 6 L64 13 L72 14 L66 19 L68 27 L60 23 L52 27 L54 19 L48 14 L56 13 Z" fill="currentColor" stroke="none"/>
+      <circle cx="50" cy="15" r="2.2" fill="currentColor" stroke="none"/>
+      <circle cx="70" cy="15" r="2.2" fill="currentColor" stroke="none"/>
+    </svg>
+    <div class="eyebrow">Διαδραστική Αναγνωστική Αποστολή</div>
+    <h1>Χριστουγεννιάτικη<br><span class="glow">Ιστορία</span></h1>
+    <div class="author">του Καρόλου Ντίκενς</div>
+    <p class="blurb">Ο Εμπενέζερ Σκρουτζ είναι ο πιο τσιγκούνης άνθρωπος της πόλης.
+      Τρία Πνεύματα θα τον επισκεφτούν για να αλλάξουν την παγωμένη του καρδιά.
+      <b>Εσύ θα τον βοηθήσεις!</b></p>
+
+    <div class="howto">
+      <h3>🎄 Πώς παίζουμε</h3>
+      <ul>
+        <li>Διαβάζουμε προσεκτικά την ιστορία, σε μικρά κομμάτια.</li>
+        <li>Σε κάθε κεφάλαιο υπάρχει ένα <b>ψηφιακό κλειδί</b>: μια ερώτηση. Πρέπει να τη βρούμε για να συνεχίσουμε!</li>
+        <li>Αν κάνουμε λάθος, δεν πειράζει — γυρνάμε στο κείμενο και ξαναπροσπαθούμε.</li>
+        <li>Η μπάρα πάνω δείχνει πόσο ζεσταίνεται η καρδιά του Σκρουτζ. Στόχος: το <b>100%</b>!</li>
+      </ul>
+    </div>
+
+    <div class="actions" style="max-width:560px;margin-left:auto;margin-right:auto;">
+      <button class="btn center" id="startBtn">Ξεκίνα την αποστολή →</button>
+    </div>
+    <p class="credit">Παιδαγωγική διασκευή για την Β΄ τάξη Δημοτικού · Φιλαναγνωσία &amp; Παιχνιδοποίηση</p>
+  </section>
+
+  <!-- GAME SCREEN -->
+  <section id="game" class="hidden">
+    <div class="chapter-head">
+      <span class="scene-icon" id="sceneIcon">🕯️</span>
+      <div class="num" id="chapNum">ΕΙΣΑΓΩΓΗ</div>
+      <h2 id="chapTitle">Ο σκληρόκαρδος Σκρουτζ</h2>
+    </div>
+    <div class="card">
+      <div class="story" id="story"></div>
+      <div class="actions" id="actions"></div>
+    </div>
+  </section>
+
+</div>
+
+<!-- MODAL: kindness trap -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="candle">🕯️</div>
+    <h3>Σταμάτα για λίγο!</h3>
+    <p>Αυτή δεν είναι ακόμη η αληθινή ιστορία.</p>
+    <p>Στην αρχή, ο Σκρουτζ έχει <b>σκληρή και παγωμένη καρδιά</b>. Δεν δίνει χρήματα σε κανέναν!</p>
+    <p>Πρέπει πρώτα να καταλάβουμε πόσο τσιγκούνης ήταν — για να δούμε αργότερα πόσο <b>θαυμάσια θα αλλάξει</b>. 💛</p>
+    <div class="actions">
+      <button class="btn center" id="closeModal">Γύρνα πίσω στην ιστορία</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   ΔΕΔΟΜΕΝΑ ΤΗΣ ΙΣΤΟΡΙΑΣ  (5 ψηφιακά επίπεδα / steps)
+   Εισαγωγή + 4 Κεφάλαια (Μάρλεϊ, Παρελθόν, Παρόν, Μέλλον)
+   ========================================================= */
+const STEPS = [
+  /* ---------- 0. ΕΙΣΑΓΩΓΗ ---------- */
+  {
+    num:"ΕΙΣΑΓΩΓΗ", title:"Ο σκληρόκαρδος Σκρουτζ", icon:"🕯️", accent:"#9fb6e8",
+    pages:[
+      "Ήταν παραμονή Χριστουγέννων κι έξω έκανε τσουχτερό κρύο. Μέσα στο γραφείο του, σκυμμένος πάνω από τα χαρτιά του, δούλευε ο Εμπενέζερ Σκρουτζ. Ήταν πλούσιος, μα φοβερά τσιγκούνης — δεν ξόδευε ποτέ ούτε μία πένα παραπάνω!",
+      "Στο διπλανό, παγωμένο δωμάτιο, ο υπάλληλός του ο Μπομπ Κράτσιτ έτρεμε από το κρύο. Ξαφνικά μπήκε χαμογελαστός ο ανιψιός του, ο Φρεντ. «Θείε, Καλά Χριστούγεννα! Έλα να φάμε μαζί!» «Κακά και ψυχρά!» γκρίνιαξε ο Σκρουτζ κι αρνήθηκε.",
+      "Λίγο αργότερα χτύπησαν την πόρτα δύο ευγενικοί κύριοι. «Μαζεύουμε χρήματα για τους φτωχούς, που πεινούν και κρυώνουν μέσα στις γιορτές», είπαν. «Μπορείτε να βοηθήσετε, κύριε Σκρουτζ;»"
+    ],
+    interaction:{
+      type:"branch",
+      prompt:"Τι θα κάνει ο Σκρουτζ; Διάλεξε αυτό που ταιριάζει στην ιστορία.",
+      options:[
+        { label:"«Όχι! Δεν δίνω ούτε μία πένα!»", correct:true,
+          win:"Σωστά! Στην αρχή ο Σκρουτζ έχει σκληρή καρδιά και δεν βοηθάει κανέναν." },
+        { label:"Δείξε καλοσύνη και δώσε του μια λίρα 💛", trap:true }
+      ]
+    },
+    afterPages:[
+      "«Όχι! Δεν δίνω τίποτα!» απάντησε ψυχρά ο Σκρουτζ. Οι δύο κύριοι έφυγαν λυπημένοι. Σαν νύχτωσε, ο Σκρουτζ έκλεισε το γραφείο, έφαγε ολομόναχος και τράβηξε για το σκοτεινό του σπίτι…"
+    ],
+    progress:18
+  },
+
+  /* ---------- 1. ΤΟ ΦΑΝΤΑΣΜΑ ΤΟΥ ΜΑΡΛΕΪ ---------- */
+  {
+    num:"ΚΕΦΑΛΑΙΟ 1", title:"Το Φάντασμα του Μάρλεϊ", icon:"👻", accent:"#8fd3d8",
+    pages:[
+      "Φτάνοντας στην πόρτα του, ο Σκρουτζ πάγωσε! Το ρόπτρο της πόρτας είχε γίνει… το πρόσωπο του Μάρλεϊ! Του παλιού του συνεταίρου, που είχε πεθάνει εδώ και εφτά χρόνια. Μια στιγμή μετά, ξανάγινε ένα κοινό ρόπτρο.",
+      "Τρομαγμένος, ο Σκρουτζ μπήκε μέσα και κάθισε δίπλα στο τζάκι. Ξαφνικά άκουσε βαριές αλυσίδες να σέρνονται! Μπροστά του εμφανίστηκε το φάντασμα του Μάρλεϊ, τυλιγμένο σε πελώριες αλυσίδες και βαριά χρηματοκιβώτια.",
+      "«Βλέπεις αυτές τις αλυσίδες;» είπε το φάντασμα. «Κάθε κρίκος είναι και μια κακή πράξη της ζωής μου. Και τα χρηματοκιβώτια είναι τα πλούτη που μάζεψα, μα ποτέ δεν τα μοιράστηκα με κανέναν. Πρόσεξε, Σκρουτζ, μη γίνεις σαν εμένα!»"
+    ],
+    interaction:{
+      type:"quiz",
+      tag:"Ψηφιακό κλειδί",
+      prompt:"Τι δείχνουν οι βαριές αλυσίδες που σέρνει ο Μάρλεϊ;",
+      options:[
+        { label:"Τα πλούτη του και τις κακές του πράξεις, που τον βαραίνουν για πάντα.",
+          correct:true,
+          win:"Μπράβο! Οι αλυσίδες είναι αόρατες στη ζωή, μα τις φτιάχνουμε με όσα κάνουμε. Ο Μάρλεϊ αγάπησε μόνο το χρήμα και ξέχασε την καλοσύνη." },
+        { label:"Ότι ο Μάρλεϊ ήταν κλεισμένος σε μια αληθινή φυλακή.",
+          hint:"Όχι ακριβώς. Οι αλυσίδες δεν είναι αληθινές. Ξαναδιάβασε τι λέει ο Μάρλεϊ για κάθε κρίκο…" },
+        { label:"Ότι ο Μάρλεϊ αγαπούσε τα χριστουγεννιάτικα στολίδια.",
+          hint:"Όχι ακριβώς. Σκέψου τι αγαπούσε ο Μάρλεϊ στη ζωή του και τι μάζευε συνέχεια…" }
+      ]
+    },
+    afterPages:[
+      "«Άκουσέ με!» συνέχισε ο Μάρλεϊ. «Έχεις μία τελευταία ευκαιρία. Θα σε επισκεφτούν τρία Πνεύματα. Άκουσέ τα καλά!» Κι έπειτα χάθηκε μέσα στη νύχτα. Ο Σκρουτζ έπεσε στο κρεβάτι κι αποκοιμήθηκε."
+    ],
+    progress:38
+  },
+
+  /* ---------- 2. ΤΟ ΠΝΕΥΜΑ ΤΟΥ ΠΑΡΕΛΘΟΝΤΟΣ ---------- */
+  {
+    num:"ΚΕΦΑΛΑΙΟ 2", title:"Το Πνεύμα του Παρελθόντος", icon:"❄️", accent:"#bcd0f2",
+    pages:[
+      "Το ρολόι χτύπησε μία. Μέσα σε μια λάμψη εμφανίστηκε το πρώτο Πνεύμα — μικρό σαν παιδί, μα με κάτασπρα μαλλιά σαν γέροντα. «Είμαι το Πνεύμα των Περασμένων Χριστουγέννων», είπε. «Έλα μαζί μου!»",
+      "Πέταξαν πάνω από στέγες και χιονισμένους κάμπους, ως την πόλη όπου ο Σκρουτζ ήταν μικρός. Σ’ ένα άδειο σχολείο, ένα μοναχικό αγοράκι διάβαζε ολομόναχο. Ο Σκρουτζ δάκρυσε: αυτό το παιδί ήταν ο ίδιος, μικρός και μόνος.",
+      "Ύστερα είδαν μια ολόχαρη χριστουγεννιάτικη γιορτή στο μαγαζί του καλού γερο-Φέζιβικ, του πρώτου του αφεντικού. Όλοι χόρευαν και γελούσαν! Ο Σκρουτζ θυμήθηκε πόσο όμορφα ένιωθε κάποτε."
+    ],
+    interaction:{
+      type:"quiz",
+      tag:"Ψηφιακό κλειδί",
+      prompt:"Γιατί δάκρυσε ο γερο-Σκρουτζ όταν είδε το μοναχικό αγοράκι στο σχολείο;",
+      options:[
+        { label:"Γιατί το μοναχικό αγοράκι ήταν ο ίδιος, μικρός και ολομόναχος.",
+          correct:true,
+          win:"Ακριβώς! Ο Σκρουτζ θυμήθηκε πόσο μόνος ένιωθε μικρός. Η καρδιά του αρχίζει σιγά-σιγά να μαλακώνει." },
+        { label:"Γιατί δεν του άρεσε καθόλου το σχολείο.",
+          hint:"Όχι ακριβώς. Κοίτα ξανά ποιο ήταν το μοναχικό παιδί που διάβαζε στο θρανίο…" },
+        { label:"Γιατί φοβήθηκε τους ήρωες των βιβλίων.",
+          hint:"Όχι ακριβώς. Ξαναδιάβασε ποιον αναγνώρισε ο Σκρουτζ μέσα σ’ εκείνο το αγοράκι…" }
+      ]
+    },
+    afterPages:[
+      "Όμως οι αναμνήσεις τον πόνεσαν. «Φτάνει, σε παρακαλώ!» φώναξε. Το Πνεύμα χαμογέλασε και σιγά-σιγά χάθηκε. Ο Σκρουτζ βρέθηκε πάλι στο κρεβάτι του."
+    ],
+    progress:58
+  },
+
+  /* ---------- 3. ΤΟ ΠΝΕΥΜΑ ΤΟΥ ΠΑΡΟΝΤΟΣ ---------- */
+  {
+    num:"ΚΕΦΑΛΑΙΟ 3", title:"Το Πνεύμα του Παρόντος", icon:"🔔", accent:"#f0b36b",
+    pages:[
+      "Ξύπνησε ξανά και είδε μια ζεστή, κατακόκκινη λάμψη. Στη σάλα καθόταν ένας χαρούμενος γίγαντας, με στεφάνι από λιόπρινο και βουνά από φαγητά γύρω του. «Είμαι το Πνεύμα των φετινών Χριστουγέννων! Έλα να δεις!»",
+      "Τον πήγε στο φτωχικό σπιτάκι του Μπομπ Κράτσιτ. Παρόλο που ήταν φτωχοί, όλη η οικογένεια ήταν μαζεμένη γύρω από το τραπέζι, γεμάτη αγάπη και χαρά. Στους ώμους του πατέρα καθόταν ο μικρός Τιμ, ένα άρρωστο αγοράκι που περπατούσε με ένα δεκανίκι.",
+      "«Πνεύμα», ρώτησε ανήσυχος ο Σκρουτζ, «θα ζήσει ο μικρός Τιμ;» «Αν τίποτα δεν αλλάξει», απάντησε λυπημένα το Πνεύμα, «το παιδάκι θα πεθάνει.» Για πρώτη φορά, η καρδιά του Σκρουτζ πόνεσε για κάποιον άλλον."
+    ],
+    interaction:{
+      type:"quiz",
+      tag:"Ψηφιακό κλειδί",
+      prompt:"Η οικογένεια Κράτσιτ είναι φτωχή. Πώς περνάει όμως τα Χριστούγεννα;",
+      options:[
+        { label:"Με αγάπη και χαρά, όλοι μαζί γύρω από το τραπέζι.",
+          correct:true,
+          win:"Πολύ σωστά! Η ευτυχία δεν χρειάζεται πολλά χρήματα — χρειάζεται αγάπη. Αυτό το μάθημα συγκινεί τον Σκρουτζ." },
+        { label:"Με θυμό και τσακωμούς όλη μέρα.",
+          hint:"Όχι ακριβώς. Θυμήσου πώς ένιωθαν όλοι μαζί στο φτωχικό τους τραπέζι…" },
+        { label:"Μόνοι και λυπημένοι, ο καθένας σε διαφορετική γωνιά.",
+          hint:"Όχι ακριβώς. Κοίτα ξανά: ήταν χωρισμένοι ή μαζεμένοι όλοι μαζί;" }
+      ]
+    },
+    afterPages:[
+      "Ο Σκρουτζ ένιωσε ντροπή για όλη του τη σκληρότητα. Το Πνεύμα τού έδειξε κι άλλους φτωχούς ανθρώπους που υπέφεραν, κι έπειτα εξαφανίστηκε αθόρυβα μέσα στη νύχτα."
+    ],
+    progress:76
+  },
+
+  /* ---------- 4. ΤΟ ΠΝΕΥΜΑ ΤΟΥ ΜΕΛΛΟΝΤΟΣ ---------- */
+  {
+    num:"ΚΕΦΑΛΑΙΟ 4", title:"Το Πνεύμα του Μέλλοντος", icon:"🌑", accent:"#a9aec4",
+    pages:[
+      "Μέσα στην ομίχλη ήρθε το τρίτο Πνεύμα. Φορούσε μια μαύρη κάπα και μια κουκούλα που έκρυβε εντελώς το πρόσωπό του. Δεν μιλούσε καθόλου — μόνο έδειχνε με το μακρύ του δάχτυλο. Ο Σκρουτζ έτρεμε ολόκληρος από φόβο.",
+      "Είδαν ανθρώπους που έλεγαν άσχημα λόγια για κάποιον πλούσιο που μόλις είχε πεθάνει· κανείς δεν τον αγαπούσε. Ύστερα, στο σπίτι των Κράτσιτ, όλοι έκλαιγαν: ο μικρός Τιμ είχε πεθάνει…",
+      "Το Πνεύμα οδήγησε τον Σκρουτζ σ’ ένα νεκροταφείο κι έδειξε έναν τάφο. Τρέμοντας, ο Σκρουτζ έσκυψε και διάβασε το όνομα πάνω στην κρύα πέτρα: «ΕΜΠΕΝΕΖΕΡ ΣΚΡΟΥΤΖ»."
+    ],
+    interaction:{
+      type:"quiz",
+      tag:"Ψηφιακό κλειδί",
+      prompt:"Ποιανού το όνομα διάβασε ο Σκρουτζ χαραγμένο πάνω στον τάφο;",
+      options:[
+        { label:"Το δικό του όνομα — ήταν ο δικός του τάφος!",
+          correct:true,
+          win:"Σωστά! Ο Σκρουτζ κατάλαβε πού θα τον οδηγήσει η σκληρή του καρδιά. Και τώρα θέλει με όλη του τη δύναμη ν’ αλλάξει." },
+        { label:"Το όνομα του Μπομπ Κράτσιτ.",
+          hint:"Όχι ακριβώς. Ξαναδιάβασε τι ήταν γραμμένο πάνω στην ταφόπλακα…" },
+        { label:"Το όνομα του μικρού Τιμ.",
+          hint:"Όχι ακριβώς. Κοίτα ξανά ποιο όνομα είδε χαραγμένο στην πέτρα ο Σκρουτζ…" }
+      ]
+    },
+    afterPages:[
+      "«Σε παρακαλώ!» φώναξε κλαίγοντας ο Σκρουτζ. «Θ’ αλλάξω! Θα γίνω καλός! Δώσε μου άλλη μια ευκαιρία!» Έσφιξε δυνατά την κάπα του Πνεύματος… μα ξαφνικά κρατούσε το κάγκελο του κρεβατιού του! Η νύχτα είχε περάσει!"
+    ],
+    progress:100
+  }
+];
+
+/* ---------- Τελική σκηνή: Η Μεγάλη Μεταστροφή ---------- */
+const FINALE = {
+  num:"ΦΙΝΑΛΕ", title:"Τα Ευτυχισμένα Χριστούγεννα", icon:"🎄", accent:"#ffd56b",
+  pages:[
+    "Ήταν πρωί — ήταν Χριστούγεννα! Ο Σκρουτζ άνοιξε διάπλατα το παράθυρο και γέλασε δυνατά. «Δεν είναι αργά! Μπορώ ν’ αλλάξω τα πάντα!»",
+    "Έστειλε κρυφά μια τεράστια γαλοπούλα στην οικογένεια Κράτσιτ. Έδωσε χρήματα στους φτωχούς. Και πήγε στη γιορτή του ανιψιού του, του Φρεντ, που τον αγκάλιασε ολόχαρος.",
+    "Την άλλη μέρα αύξησε τον μισθό του Μπομπ και φρόντισε τον μικρό Τιμ, που έγινε γερός κι ευτυχισμένος. Ο Σκρουτζ έγινε ο πιο καλόκαρδος άνθρωπος της πόλης — και γιόρταζε τα Χριστούγεννα καλύτερα απ’ όλους. Καλά Χριστούγεννα!"
+  ]
+};
+
+/* =========================================================
+   ΜΗΧΑΝΗ ΠΑΙΧΝΙΔΙΟΥ
+   ========================================================= */
+const $ = id => document.getElementById(id);
+let stepIndex = 0, pageIndex = 0, phase = "reading", progress = 0;
+
+/* snow */
+(function snow(){
+  const box = $("snow"); if(!box) return;
+  const chars = ["❅","❆","•","∗"];
+  for(let i=0;i<26;i++){
+    const f = document.createElement("span");
+    f.className = "flake";
+    f.textContent = chars[i % chars.length];
+    f.style.left = Math.random()*100+"vw";
+    f.style.fontSize = (8+Math.random()*16)+"px";
+    f.style.opacity = .3+Math.random()*.5;
+    const dur = 9+Math.random()*11;
+    f.style.animationDuration = dur+"s";
+    f.style.animationDelay = (-Math.random()*dur)+"s";
+    box.appendChild(f);
+  }
+})();
+
+/* font size */
+let fsSteps = 0;
+function applyFs(){
+  const base = 1.34 + fsSteps*0.12;
+  document.documentElement.style.setProperty("--fs", base+"rem");
+}
+$("bigger").onclick = ()=>{ if(fsSteps<3){fsSteps++; applyFs();} };
+$("smaller").onclick = ()=>{ if(fsSteps>-1){fsSteps--; applyFs();} };
+
+/* progress */
+function setProgress(p){
+  progress = Math.max(progress, p);
+  $("fill").style.width = progress+"%";
+  $("pct").textContent = progress+"%";
+}
+
+/* start */
+$("startBtn").onclick = ()=>{
+  $("start").classList.add("hidden");
+  $("topbar").classList.remove("hidden");
+  $("game").classList.remove("hidden");
+  stepIndex = 0; pageIndex = 0; phase = "reading";
+  renderStep();
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+$("restart").onclick = ()=>{
+  if(confirm("Θέλεις να ξεκινήσεις την αποστολή από την αρχή;")){
+    progress = 0; setProgress(0);
+    $("game").classList.add("hidden");
+    $("topbar").classList.add("hidden");
+    $("start").classList.remove("hidden");
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+};
+
+/* header */
+function setHeader(s){
+  $("sceneIcon").textContent = s.icon;
+  $("chapNum").textContent = s.num;
+  $("chapTitle").textContent = s.title;
+  document.documentElement.style.setProperty("--accent", s.accent || "var(--gold)");
+}
+
+/* render a story page with Συνέχεια */
+function showPage(pages, idx, onDone, drop){
+  const story = $("story");
+  const p = document.createElement("p");
+  p.className = "fade-in" + (drop && idx===0 ? " drop" : "");
+  p.textContent = pages[idx];
+  story.appendChild(p);
+
+  const actions = $("actions");
+  actions.innerHTML = "";
+  const btn = document.createElement("button");
+  btn.className = "btn center";
+  const last = idx >= pages.length-1;
+  btn.textContent = last ? "Συνέχεια →" : "Συνέχεια ▾";
+  btn.onclick = ()=>{
+    if(last){ onDone(); }
+    else { showPage(pages, idx+1, onDone, drop); btn.scrollIntoView({behavior:"smooth",block:"center"}); }
+  };
+  actions.appendChild(btn);
+}
+
+/* render whole step */
+function renderStep(){
+  const s = STEPS[stepIndex];
+  setHeader(s);
+  $("story").innerHTML = "";
+  // read intro pages, then interaction
+  showPage(s.pages, 0, ()=>renderInteraction(s), true);
+}
+
+/* interaction: branch or quiz */
+function renderInteraction(s){
+  const inter = s.interaction;
+  const story = $("story");
+  const actions = $("actions");
+  actions.innerHTML = "";
+
+  // prompt line
+  const q = document.createElement("div");
+  q.className = "q fade-in";
+  q.innerHTML = (inter.tag ? `<span class="qtag">🔑 ${inter.tag}</span><br>` : "") + inter.prompt;
+  story.appendChild(q);
+
+  if(inter.type === "branch"){
+    inter.options.forEach(opt=>{
+      const b = document.createElement("button");
+      b.className = "btn choice" + (opt.trap ? " tempt" : "");
+      b.textContent = opt.label;
+      b.onclick = ()=>{
+        if(opt.trap){ openModal(); return; }
+        // correct → feedback + proceed
+        lockButtons(actions);
+        showFeedback(opt.win, "win");
+        addProceed(()=>afterStep(s));
+      };
+      actions.appendChild(b);
+    });
+  }
+
+  if(inter.type === "quiz"){
+    inter.options.forEach(opt=>{
+      const b = document.createElement("button");
+      b.className = "btn quiz";
+      b.textContent = opt.label;
+      b.onclick = ()=>{
+        clearFeedback();
+        if(opt.correct){
+          b.classList.add("right");
+          lockButtons(actions);
+          showFeedback(opt.win, "win");
+          addProceed(()=>afterStep(s));
+        } else {
+          b.classList.add("wrong");
+          setTimeout(()=>b.classList.remove("wrong"), 450);
+          showFeedback(opt.hint, "hint");
+        }
+      };
+      actions.appendChild(b);
+    });
+  }
+}
+
+/* after the interaction: afterPages, progress, next step or finale */
+function afterStep(s){
+  $("story").innerHTML = "";
+  setProgress(s.progress);
+  showPage(s.afterPages, 0, ()=>{
+    if(stepIndex < STEPS.length-1){
+      stepIndex++; renderStep();
+      window.scrollTo({top:0,behavior:"smooth"});
+    } else {
+      renderFinale();
+    }
+  });
+}
+
+/* finale */
+function renderFinale(){
+  setHeader(FINALE);
+  setProgress(100);
+  $("story").innerHTML = "";
+  showPage(FINALE.pages, 0, ()=>showEndCard(), true);
+}
+
+function showEndCard(){
+  const story = $("story");
+  story.innerHTML = "";
+  const wrap = document.createElement("div");
+  wrap.className = "fade-in";
+  wrap.innerHTML = `
+    <div style="text-align:center;font-size:2.6rem;">🎉🎄💛</div>
+    <h2 style="font-family:'Playfair Display',serif;text-align:center;color:var(--gold-bright);
+        font-size:1.9rem;margin:.2em 0 .1em;">Μπράβο! Τα κατάφερες!</h2>
+    <p style="text-align:center;font-size:1.18rem;margin:.2em 0 0;">
+      Βοήθησες τον Σκρουτζ να ζεστάνει την καρδιά του — από παγωμένη και σκληρή,
+      σε ζεστή και γενναιόδωρη.</p>
+
+    <div class="end-moral">
+      <b>Το μήνυμα του Ντίκενς:</b> Ποτέ δεν είναι αργά για να γίνουμε καλύτεροι.
+      Όταν μοιραζόμαστε αγάπη και καλοσύνη, όλος ο κόσμος γίνεται πιο όμορφος. ✨
+    </div>
+
+    <div class="activity">
+      <h3>✏️ Τώρα είναι η σειρά σου!</h3>
+      <p>Διάλεξε μία δραστηριότητα και φτιάξ’ την στο τετράδιό σου:</p>
+      <ul>
+        <li>Ζωγράφισε την καρδιά του Σκρουτζ <b>«πριν»</b> και <b>«μετά»</b> την αλλαγή του.</li>
+        <li>Γράψε ένα μικρό γράμμα που στέλνει ο <b>Μπομπ Κράτσιτ</b>, για να ευχαριστήσει τον Σκρουτζ για τη βοήθειά του.</li>
+      </ul>
+    </div>
+  `;
+  story.appendChild(wrap);
+
+  const actions = $("actions");
+  actions.innerHTML = "";
+  const replay = document.createElement("button");
+  replay.className = "btn center";
+  replay.textContent = "↺ Παίξε ξανά την ιστορία";
+  replay.onclick = ()=>{
+    progress = 0; setProgress(0);
+    stepIndex = 0; pageIndex = 0; phase="reading";
+    renderStep(); window.scrollTo({top:0,behavior:"smooth"});
+  };
+  actions.appendChild(replay);
+}
+
+/* helpers */
+function lockButtons(container){
+  [...container.querySelectorAll("button")].forEach(b=>{
+    if(!b.classList.contains("right")) b.disabled = true;
+    b.style.cursor = "default";
+  });
+}
+function showFeedback(text, kind){
+  clearFeedback();
+  const fb = document.createElement("div");
+  fb.className = "feedback " + kind;
+  fb.id = "feedback";
+  fb.innerHTML = (kind==="hint" ? "🔎 " : "🌟 ") + `<span class="${kind==='win'?'key':''}"></span>` + text;
+  $("actions").appendChild(fb);
+  fb.scrollIntoView({behavior:"smooth",block:"center"});
+}
+function clearFeedback(){
+  const old = $("feedback"); if(old) old.remove();
+}
+function addProceed(fn){
+  const b = document.createElement("button");
+  b.className = "btn center";
+  b.textContent = "Συνέχεια στην ιστορία →";
+  b.onclick = fn;
+  $("actions").appendChild(b);
+  b.scrollIntoView({behavior:"smooth",block:"center"});
+}
+
+/* modal */
+function openModal(){ $("overlay").classList.add("show"); }
+$("closeModal").onclick = ()=> $("overlay").classList.remove("show");
+$("overlay").addEventListener("click", e=>{ if(e.target===$("overlay")) $("overlay").classList.remove("show"); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") $("overlay").classList.remove("show"); });
+</script>
+</body>
+</html>
