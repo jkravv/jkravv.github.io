@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Το Μυστικό του Αη-Βασίλη</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Noto+Sans:wght@400;600;700&display=swap">
+<style>
+/* Layout: a frosted window (the hidden picture) beside a stack of riddle cards; each correct word clears one pane of frost. */
+:root{
+  --night:#0f1f3a;
+  --night-2:#18305a;
+  --card:#f6f3ec;
+  --ink:#1b2438;
+  --muted:#5a6680;
+  --red:#c8312f;
+  --gold:#f2c14e;
+  --pine:#2f7d5b;
+  --frost:#dfeaf5;
+  --display:"Comfortaa", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:radial-gradient(120% 80% at 50% 0%, var(--night-2), var(--night) 70%);
+  background-color:var(--night);
+  color:var(--frost);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.5;
+  min-height:100vh;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:28px 48px;
+  overflow-x:hidden;
+}
+#snow{position:fixed;inset:0;pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+
+header{display:flex;flex-direction:column;gap:8px;max-width:62ch}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,5vw,48px);line-height:1.1;margin:0;text-wrap:balance;color:#fff}
+h1 span{color:var(--red);background:#fff;padding:0 .2em;border-radius:6px}
+.lead{margin:0;color:#c7d4e8;font-size:17px}
+
+.main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px;align-items:start}
+@media (max-width:820px){.main{grid-template-columns:1fr}}
+
+/* Window */
+.window-col{position:sticky;top:calc(16px + env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:14px}
+@media (max-width:820px){.window-col{position:static}}
+.window{
+  position:relative;border-radius:14px;overflow:hidden;
+  border:10px solid #7a4a2b;
+  box-shadow:0 0 0 3px #4e2d18, 0 20px 50px rgba(0,0,0,.45);
+  aspect-ratio:4/3;max-width:100%;background:var(--night);
+}
+.window svg.scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+.panes{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr)}
+.pane{
+  border:3px solid #7a4a2b;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,.9), transparent 40%),
+    radial-gradient(circle at 75% 70%, rgba(255,255,255,.7), transparent 45%),
+    linear-gradient(160deg,#eef4fb,#c9d9ea);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-weight:700;font-size:clamp(18px,3vw,28px);color:#8aa3c0;
+  transition:opacity 1.2s ease, filter 1.2s ease, transform 1.2s ease;
+}
+.pane.clear{opacity:0;filter:blur(8px);transform:scale(1.08)}
+.progress{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:15px;color:#c7d4e8}
+.progress b{color:var(--gold);font-variant-numeric:tabular-nums}
+.bar{flex:1;height:8px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--gold));transition:width .6s ease}
+
+.reveal{
+  display:none;text-align:center;padding:16px;border-radius:12px;
+  background:var(--red);color:#fff;
+  font-family:var(--display);font-weight:700;font-size:clamp(22px,3.5vw,30px);
+  box-shadow:0 10px 30px rgba(200,49,47,.4);
+  animation:pop .7s cubic-bezier(.2,1.4,.4,1);
+}
+.reveal small{display:block;font-family:var(--body);font-weight:400;font-size:15px;opacity:.9;margin-top:4px}
+.reveal.show{display:block}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* Clues */
+.clues{display:flex;flex-direction:column;gap:14px;list-style:none;margin:0;padding:0}
+.clue{
+  background:var(--card);color:var(--ink);border-radius:12px;padding:16px 18px;
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;align-items:start;
+  border:2px solid transparent;transition:border-color .3s, background .3s;
+}
+.clue .num{
+  grid-row:span 3;width:38px;height:38px;border-radius:50%;
+  background:var(--night-2);color:#fff;font-family:var(--display);font-weight:700;
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+}
+.clue p{margin:0;font-size:16px;font-weight:600;line-height:1.4}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.clue input{
+  flex:1 1 180px;min-width:0;
+  font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:.12em;text-transform:uppercase;
+  padding:10px 12px;border-radius:8px;border:2px solid #c9cfdb;background:#fff;color:var(--ink);
+  color-scheme:light;
+}
+.clue input::placeholder{color:#a9b1c2;letter-spacing:.3em}
+.clue input:focus{outline:none;border-color:var(--night-2);box-shadow:0 0 0 3px rgba(24,48,90,.2)}
+.clue button{
+  font-family:var(--body);font-weight:600;font-size:14px;
+  padding:10px 14px;border-radius:8px;border:2px solid var(--night-2);background:transparent;color:var(--night-2);cursor:pointer;
+}
+.clue button:hover{background:var(--night-2);color:#fff}
+.clue button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.meta{font-size:13px;color:var(--muted);margin-top:6px}
+.clue.wrong input{border-color:var(--red);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.clue.done{background:#e4f2ea;border-color:var(--pine)}
+.clue.done .num{background:var(--pine)}
+.clue.done input{border-color:var(--pine);color:var(--pine);background:#f4fbf7}
+.clue.done button{display:none}
+.clue.done .meta{color:var(--pine);font-weight:600}
+
+.tools{display:flex;gap:10px;flex-wrap:wrap}
+.reset{
+  font-family:var(--body);font-weight:600;font-size:14px;padding:10px 16px;border-radius:8px;
+  border:2px solid rgba(255,255,255,.35);background:transparent;color:#fff;cursor:pointer;
+}
+.reset:hover{background:rgba(255,255,255,.1)}
+.reset:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  #snow{display:none}
+}
+</style>
+</head>
+<body>
+
+<canvas id="snow" aria-hidden="true"></canvas>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Χριστουγεννιάτικο παιχνίδι λέξεων</div>
+    <h1>Το Μυστικό του <span>Αη-Βασίλη</span></h1>
+    <p class="lead">Λύσε τους γρίφους και γράψε τις λέξεις-κλειδιά με <strong>ΚΕΦΑΛΑΙΑ</strong> γράμματα. Κάθε σωστή λέξη λιώνει ένα τζάμι από πάγο. Τι κρύβεται πίσω από το παράθυρο;</p>
+  </header>
+
+  <div class="main">
+    <div class="window-col">
+      <div class="window" aria-label="Παγωμένο παράθυρο με κρυμμένη εικόνα">
+        <svg class="scene" viewBox="0 0 400 300" aria-hidden="true">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#0b1a36"/><stop offset="1" stop-color="#2b4a7e"/>
+            </linearGradient>
+          </defs>
+          <rect width="400" height="300" fill="url(#sky)"/>
+          <g fill="#fff">
+            <circle cx="40" cy="30" r="1.5"/><circle cx="120" cy="18" r="1.2"/><circle cx="210" cy="40" r="1.4"/>
+            <circle cx="260" cy="15" r="1"/><circle cx="170" cy="70" r="1"/><circle cx="25" cy="95" r="1.2"/>
+            <circle cx="90" cy="60" r="1"/><circle cx="380" cy="110" r="1.2"/>
+          </g>
+          <circle cx="330" cy="55" r="30" fill="#fbf3d0"/>
+          <circle cx="342" cy="48" r="28" fill="#2a4776" opacity=".0"/>
+          <!-- reindeer -->
+          <g fill="#7a4a2b">
+            <g transform="translate(62 92)">
+              <ellipse cx="0" cy="0" rx="16" ry="7"/><rect x="8" y="-14" width="5" height="12" rx="2"/>
+              <ellipse cx="14" cy="-16" rx="6" ry="4"/>
+              <path d="M10 -20 l-4 -10 M10 -20 l-8 -4 M15 -20 l4 -10 M15 -20 l8 -5" stroke="#7a4a2b" stroke-width="2" fill="none"/>
+              <rect x="-12" y="4" width="3" height="10"/><rect x="-5" y="4" width="3" height="11"/>
+              <rect x="4" y="4" width="3" height="11"/><rect x="10" y="4" width="3" height="9"/>
+              <circle cx="20" cy="-16" r="3" fill="#e53935"/>
+            </g>
+            <g transform="translate(108 104)">
+              <ellipse cx="0" cy="0" rx="16" ry="7"/><rect x="8" y="-14" width="5" height="12" rx="2"/>
+              <ellipse cx="14" cy="-16" rx="6" ry="4"/>
+              <path d="M10 -20 l-4 -10 M10 -20 l-8 -4 M15 -20 l4 -10 M15 -20 l8 -5" stroke="#7a4a2b" stroke-width="2" fill="none"/>
+              <rect x="-12" y="4" width="3" height="10"/><rect x="-5" y="4" width="3" height="11"/>
+              <rect x="4" y="4" width="3" height="11"/><rect x="10" y="4" width="3" height="9"/>
+            </g>
+          </g>
+          <path d="M80 92 Q130 120 170 118" stroke="#f2c14e" stroke-width="1.5" fill="none"/>
+          <!-- sleigh -->
+          <g transform="translate(150 100)">
+            <path d="M20 18 h70 q14 0 14 -14 v-6 h-10 v6 q0 4 -4 4 h-60 z" fill="#c8312f"/>
+            <path d="M14 30 h86 q10 0 14 -8" stroke="#f2c14e" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <rect x="30" y="20" width="3" height="10" fill="#f2c14e"/><rect x="80" y="20" width="3" height="10" fill="#f2c14e"/>
+            <!-- sack -->
+            <path d="M70 0 q-6 -22 10 -26 q16 4 10 26 z" fill="#8a5a33"/>
+            <!-- santa -->
+            <circle cx="46" cy="-14" r="13" fill="#c8312f"/>
+            <circle cx="46" cy="-30" r="8" fill="#f6d2b8"/>
+            <path d="M38 -28 q8 18 16 0 q-2 8 -8 10 q-6 -2 -8 -10z" fill="#fff"/>
+            <path d="M37 -33 q9 -16 20 -2 z" fill="#c8312f"/>
+            <circle cx="60" cy="-36" r="3" fill="#fff"/>
+            <rect x="37" y="-35" width="19" height="4" rx="2" fill="#fff"/>
+          </g>
+          <!-- hills -->
+          <path d="M0 220 Q100 185 200 215 T400 205 V300 H0z" fill="#e6eff8"/>
+          <path d="M0 250 Q120 225 240 250 T400 245 V300 H0z" fill="#ffffff"/>
+          <!-- house -->
+          <g transform="translate(250 175)">
+            <rect x="0" y="30" width="90" height="60" fill="#a34a2f"/>
+            <path d="M-10 32 L45 -8 L100 32 z" fill="#5a2d1c"/>
+            <path d="M-10 32 L45 -8 L100 32" stroke="#fff" stroke-width="6" fill="none"/>
+            <rect x="65" y="-10" width="14" height="28" fill="#7d3b26"/>
+            <rect x="62" y="-14" width="20" height="6" fill="#fff"/>
+            <rect x="14" y="44" width="22" height="20" fill="#f2c14e"/>
+            <rect x="54" y="54" width="20" height="36" fill="#5a2d1c"/>
+          </g>
+          <!-- trees -->
+          <g fill="#2f7d5b">
+            <path d="M40 240 l22 -50 l22 50 z"/><path d="M46 215 l16 -38 l16 38 z"/>
+            <path d="M190 250 l18 -42 l18 42 z"/>
+          </g>
+          <circle cx="62" cy="176" r="4" fill="#f2c14e"/>
+          <rect x="58" y="240" width="8" height="10" fill="#5a2d1c"/>
+          <rect x="205" y="250" width="6" height="8" fill="#5a2d1c"/>
+          <!-- presents -->
+          <rect x="110" y="238" width="22" height="18" fill="#c8312f"/><rect x="119" y="238" width="4" height="18" fill="#f2c14e"/>
+          <rect x="135" y="244" width="18" height="12" fill="#2f7d5b"/><rect x="142" y="244" width="4" height="12" fill="#fff"/>
+        </svg>
+        <div class="panes" id="panes"></div>
+      </div>
+      <div class="progress">
+        <span>Τζάμια που έλιωσαν: <b id="count">0 / 8</b></span>
+        <div class="bar"><i id="bar"></i></div>
+      </div>
+      <div class="reveal" id="reveal">ΧΡΟΝΙΑ ΠΟΛΛΑ! 🎅<small>Βρήκες όλες τις λέξεις και ο Αη-Βασίλης έρχεται με τα δώρα!</small></div>
+      <div class="tools"><button class="reset" id="reset" type="button">Ξεκίνα από την αρχή</button></div>
+    </div>
+
+    <ol class="clues" id="clues"></ol>
+  </div>
+</div>
+
+<script>
+const CLUES = [
+  {q:"Τι φέρνει ο Άγιος Βασίλης στα παιδιά την Πρωτοχρονιά;", a:"ΔΩΡΑ"},
+  {q:"Ποιο είναι το όχημα του Αη-Βασίλη που πετάει στον ουρανό;", a:"ΕΛΚΗΘΡΟ"},
+  {q:"Ποια ζώα σέρνουν το όχημά του;", a:"ΤΑΡΑΝΔΟΙ"},
+  {q:"Από πού κατεβαίνει ο Αη-Βασίλης για να μπει στο σπίτι;", a:"ΚΑΜΙΝΑΔΑ"},
+  {q:"Ποιο γλυκό με το φλουρί κόβουμε την Πρωτοχρονιά;", a:"ΒΑΣΙΛΟΠΙΤΑ"},
+  {q:"Τι χρώμα έχει η στολή του Αη-Βασίλη;", a:"ΚΟΚΚΙΝΟ"},
+  {q:"Τι μακρύ και άσπρο έχει στο πρόσωπό του;", a:"ΓΕΝΙΑ"},
+  {q:"Πώς λέγονται τα τραγούδια που λένε τα παιδιά πόρτα-πόρτα;", a:"ΚΑΛΑΝΤΑ"}
+];
+
+const norm = s => s.toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/\s+/g,"");
+
+const panesEl = document.getElementById("panes");
+const cluesEl = document.getElementById("clues");
+const order = [5,2,7,0,3,6,1,4]; // which pane each clue clears, so the picture appears in a scattered way
+const panes = [];
+for(let i=0;i<8;i++){
+  const d=document.createElement("div");
+  d.className="pane"; d.textContent="❄";
+  panesEl.appendChild(d); panes.push(d);
+}
+
+let solved = new Set();
+
+CLUES.forEach((c,i)=>{
+  const li=document.createElement("li");
+  li.className="clue";
+  li.innerHTML=`
+    <div class="num">${i+1}</div>
+    <p>${c.q}</p>
+    <div class="row">
+      <input id="w${i}" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false"
+        aria-label="Απάντηση για τον γρίφο ${i+1}" placeholder="${"_".repeat(c.a.length)}" maxlength="${c.a.length+4}">
+      <button type="button">Βοήθεια</button>
+    </div>
+    <div class="meta">${c.a.length} γράμματα</div>`;
+  const input=li.querySelector("input"), btn=li.querySelector("button"), meta=li.querySelector(".meta");
+  let hints=0;
+  input.addEventListener("input",()=>{
+    const pos=input.selectionStart;
+    input.value=input.value.toUpperCase();
+    try{input.setSelectionRange(pos,pos)}catch(e){}
+    li.classList.remove("wrong");
+    if(norm(input.value)===c.a) win(i,li,input,meta);
+  });
+  input.addEventListener("keydown",e=>{
+    if(e.key==="Enter" && !solved.has(i)){
+      li.classList.remove("wrong"); void li.offsetWidth; li.classList.add("wrong");
+      meta.textContent="Δεν είναι αυτή η λέξη. Δοκίμασε ξανά!";
+    }
+  });
+  btn.addEventListener("click",()=>{
+    hints=Math.min(hints+1,c.a.length-1);
+    meta.textContent=`Ξεκινάει με: ${c.a.slice(0,hints)}… (${c.a.length} γράμματα)`;
+    input.focus();
+  });
+  cluesEl.appendChild(li);
+});
+
+function win(i,li,input,meta){
+  if(solved.has(i)) return;
+  solved.add(i);
+  li.classList.add("done");
+  input.value=CLUES[i].a; input.readOnly=true;
+  meta.textContent="Μπράβο! Ένα τζάμι έλιωσε ✓";
+  panes[order[i]].classList.add("clear");
+  update();
+  const next=[...document.querySelectorAll(".clue:not(.done) input")][0];
+  if(next) setTimeout(()=>next.focus({preventScroll:true}),300);
+}
+
+function update(){
+  document.getElementById("count").textContent=`${solved.size} / 8`;
+  document.getElementById("bar").style.width=`${solved.size/8*100}%`;
+  document.getElementById("reveal").classList.toggle("show",solved.size===8);
+  if(solved.size===8) burst=200;
+}
+
+document.getElementById("reset").addEventListener("click",()=>{
+  solved.clear();
+  document.querySelectorAll(".clue").forEach((li,i)=>{
+    li.classList.remove("done","wrong");
+    const inp=li.querySelector("input"); inp.value=""; inp.readOnly=false;
+    li.querySelector(".meta").textContent=`${CLUES[i].a.length} γράμματα`;
+  });
+  panes.forEach(p=>p.classList.remove("clear"));
+  update();
+});
+
+/* Snow */
+const cv=document.getElementById("snow"), ctx=cv.getContext("2d");
+let flakes=[], burst=0;
+function size(){cv.width=innerWidth;cv.height=innerHeight}
+size(); addEventListener("resize",size);
+for(let i=0;i<90;i++) flakes.push(mk(Math.random()*innerHeight));
+function mk(y){return{x:Math.random()*innerWidth,y:y??-10,r:1+Math.random()*2.5,s:.4+Math.random()*1.1,d:Math.random()*Math.PI*2}}
+function tick(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.fillStyle="rgba(255,255,255,.85)";
+  if(burst>0){flakes.push(mk());burst--}
+  flakes.forEach(f=>{
+    f.y+=f.s; f.d+=.01; f.x+=Math.sin(f.d)*.4;
+    if(f.y>cv.height+5){Object.assign(f,mk())}
+    ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fill();
+  });
+  if(flakes.length>250) flakes.splice(0,flakes.length-250);
+  requestAnimationFrame(tick);
+}
+if(!matchMedia("(prefers-reduced-motion: reduce)").matches) tick();
+</script>
+</body>
+</html>
