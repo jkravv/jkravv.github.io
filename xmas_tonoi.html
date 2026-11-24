@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Χριστουγεννιάτικο Εργαστήρι Τονισμού - Β' Δημοτικού</title>
+    <!-- Φόρτωση Tailwind CSS για responsive σχεδίαση -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Φόρτωση φιλικών, ευανάγνωστων ελληνικών γραμματοσειρών -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Βασικές ρυθμίσεις και χριστουγεννιάτικο θέμα */
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: radial-gradient(circle at top, #1e3a8a 0%, #0f172a 65%, #090d16 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        h1, h2, .title-font {
+            font-family: 'Comfortaa', cursive, sans-serif;
+        }
+
+        /* Εφέ χιονόπτωσης στο φόντο */
+        #snow-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Κινούμενα σχέδια για τα στολίδια, τη λέξη και τα μηνύματα */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.7)); transform: scale(1); }
+            50% { filter: drop-shadow(0 0 18px rgba(250, 204, 21, 1)); transform: scale(1.08); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-10px) rotate(-1deg); }
+            40% { transform: translateX(10px) rotate(1deg); }
+            60% { transform: translateX(-8px); }
+            80% { transform: translateX(8px); }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0) rotate(-30deg); opacity: 0; }
+            70% { transform: scale(1.25) rotate(10deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        @keyframes toneBounce {
+            0% { transform: translateY(-25px) scale(0.5); opacity: 0; }
+            60% { transform: translateY(3px) scale(1.2); opacity: 1; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .animate-float {
+            animation: float 3.5s ease-in-out infinite;
+        }
+
+        .star-glow {
+            animation: pulseGlow 2.5s infinite ease-in-out;
+        }
+
+        .animate-shake {
+            animation: shake 0.45s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        .ornament-pop {
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            transform-origin: center;
+        }
+
+        .tone-appear {
+            display: inline-block;
+            animation: toneBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        /* Στυλ κουμπιών φωνηέντων */
+        .vowel-btn {
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 5px 0 #b45309, 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        .vowel-btn:hover:not(:disabled) {
+            transform: translateY(-4px) scale(1.06);
+            box-shadow: 0 8px 0 #b45309, 0 12px 20px rgba(0,0,0,0.3);
+            background-color: #fef08a;
+        }
+
+        .vowel-btn:active:not(:disabled) {
+            transform: translateY(3px) scale(0.98);
+            box-shadow: 0 2px 0 #b45309;
+        }
+
+        .vowel-correct {
+            background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+            color: white !important;
+            border-color: #86efac !important;
+            box-shadow: 0 5px 0 #15803d, 0 0 20px rgba(34, 197, 94, 0.6) !important;
+            transform: scale(1.1) !important;
+        }
+
+        .vowel-wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #b91c1c !important;
+            box-shadow: 0 4px 0 #dc2626 !important;
+        }
+
+        /* Ενεργός δείκτης πληκτρολογίου (αστέρι/σκούφος) */
+        .vowel-selected {
+            ring: 4px;
+            border-color: #ef4444 !important;
+            background-color: #fef08a !important;
+            transform: translateY(-6px) scale(1.08);
+            box-shadow: 0 9px 0 #b45309, 0 0 22px rgba(250, 204, 21, 0.85) !important;
+        }
+
+        @keyframes pointerBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-5px) scale(1.15); }
+        }
+
+        .kb-pointer {
+            animation: pointerBounce 1.1s infinite ease-in-out;
+        }
+
+        /* Οπτικά πλήκτρα οδηγού πληκτρολογίου */
+        .kbd-key {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+            border: 2px solid #cbd5e1;
+            border-bottom-width: 4px;
+            border-radius: 0.5rem;
+            padding: 0.15rem 0.5rem;
+            font-weight: 800;
+            color: #1e293b;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            transition: transform 0.1s, background 0.1s;
+        }
+
+        .kbd-key.key-active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+            background: #fde047;
+            border-color: #eab308;
+        }
+
+        /* Εφέ λαμπάκια στο δέντρο */
+        .tree-light {
+            animation: twinkle 1.8s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="text-slate-800 flex flex-col justify-between relative">
+
+    <!-- Καμβάς για το χιόνι και τα εορταστικά κονφετί -->
+    <canvas id="snow-canvas"></canvas>
+
+    <!-- Πάνω μπάρα πλοήγησης -->
+    <header class="relative z-10 w-full max-w-6xl mx-auto px-4 pt-4 pb-2 flex items-center justify-between">
+        <div class="flex items-center gap-2 sm:gap-3 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full text-white shadow-lg">
+            <span class="text-2xl sm:text-3xl">🎅</span>
+            <span class="font-bold text-sm sm:text-lg tracking-wide">Εργαστήρι Τονισμού</span>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-3">
+            <!-- Κουμπί επιστροφής στο μενού (εμφανίζεται κατά τη διάρκεια του παιχνιδιού) -->
+            <button id="home-btn" onclick="returnToMenu()" class="hidden bg-white/15 hover:bg-white/25 text-white border border-white/25 px-3 py-2 sm:px-4 sm:py-2 rounded-full font-bold text-sm sm:text-base transition flex items-center gap-1.5 shadow-md active:scale-95">
+                <span>🏠</span>
+                <span class="hidden sm:inline">Αρχική</span>
+            </button>
+
+            <!-- Κουμπί ήχου / σίγασης -->
+            <button id="sound-btn" onclick="toggleSound()" aria-label="Εναλλαγή ήχου" class="bg-amber-400 hover:bg-amber-300 text-amber-950 border-2 border-amber-200 px-3 py-2 sm:px-4 sm:py-2 rounded-full font-extrabold text-sm sm:text-base transition flex items-center gap-1.5 shadow-lg active:scale-95">
+                <span id="sound-icon" class="text-lg">🔊</span>
+                <span id="sound-label" class="hidden sm:inline">Ήχος: Ναι</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Κύριο Περιεχόμενο -->
+    <main class="relative z-10 flex-grow flex items-center justify-center px-4 py-4 sm:py-6">
+
+        <!-- 1. ΑΡΧΙΚΗ ΟΘΟΝΗ -->
+        <section id="start-screen" class="w-full max-w-3xl bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border-4 border-amber-400 p-6 sm:p-10 text-center">
+            <div class="inline-flex items-center justify-center gap-2 bg-red-100 text-red-700 font-extrabold px-4 py-1.5 rounded-full text-xs sm:text-sm mb-3 border border-red-200">
+                <span>🎄</span>
+                <span>Β' Δημοτικού • Χριστουγεννιάτικη Αποστολή</span>
+                <span>🎄</span>
+            </div>
+
+            <h1 class="text-2xl sm:text-4xl md:text-5xl font-extrabold text-slate-800 mb-3 leading-tight">
+                Βάλε τον Τόνο &amp; Στόλισε το Δέντρο!
+            </h1>
+
+            <p class="text-base sm:text-xl text-slate-600 font-semibold max-w-xl mx-auto mb-6">
+                Βοήθησε τα ξωτικά του Άγιου Βασίλη! <strong>Ξαναγράψε κάθε λέξη με τον σωστό τόνο από το πληκτρολόγιο</strong> και στόλισε σιγά-σιγά το χριστουγεννιάτικο δέντρο με <strong>10 στολίδια</strong>!
+            </p>
+
+            <!-- Επιλογή επιπέδου δυσκολίας -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-2xl mx-auto mb-6">
+                <!-- Επίπεδο 1: Εύκολο -->
+                <button onclick="startGame('easy')" class="group relative bg-gradient-to-b from-emerald-500 to-emerald-700 hover:from-emerald-400 hover:to-emerald-600 text-white rounded-2xl p-6 border-4 border-emerald-300 shadow-xl transition-all transform hover:-translate-y-1 active:translate-y-1 text-left flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="bg-emerald-900/40 text-emerald-100 text-xs font-extrabold uppercase px-3 py-1 rounded-full">Επίπεδο 1</span>
+                            <span class="text-3xl group-hover:scale-125 transition-transform">🔔</span>
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-extrabold mb-1">Εύκολο</h2>
+                        <p class="text-emerald-100 text-sm sm:text-base font-medium">
+                            Μικρές χριστουγεννιάτικες λέξεις (2 και 3 συλλαβές) με απλά φωνήεντα.
+                        </p>
+                    </div>
+                    <div class="mt-4 inline-flex items-center gap-2 font-extrabold text-amber-200 text-sm sm:text-base">
+                        <span>Πάτησε για αρχή</span>
+                        <span>➔</span>
+                    </div>
+                </button>
+
+                <!-- Επίπεδο 2: Προχωρημένο -->
+                <button onclick="startGame('hard')" class="group relative bg-gradient-to-b from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white rounded-2xl p-6 border-4 border-amber-300 shadow-xl transition-all transform hover:-translate-y-1 active:translate-y-1 text-left flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="bg-red-950/40 text-amber-200 text-xs font-extrabold uppercase px-3 py-1 rounded-full">Επίπεδο 2</span>
+                            <span class="text-3xl group-hover:scale-125 transition-transform">🦌</span>
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-extrabold mb-1">Προχωρημένο</h2>
+                        <p class="text-red-100 text-sm sm:text-base font-medium">
+                            Μεγαλύτερες λέξεις και δίψηφα φωνήεντα (<span class="underline decoration-amber-300 font-bold">αι, ει, οι, ου, αυ, ευ</span>)!
+                        </p>
+                    </div>
+                    <div class="mt-4 inline-flex items-center gap-2 font-extrabold text-amber-300 text-sm sm:text-base">
+                        <span>Πάτησε για αρχή</span>
+                        <span>➔</span>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Μικρή υπενθύμιση κανόνα για τα παιδιά -->
+            <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-3 sm:p-4 max-w-xl mx-auto flex items-center gap-3 text-left">
+                <span class="text-2xl sm:text-3xl flex-shrink-0">⌨️</span>
+                <p class="text-xs sm:text-sm text-amber-900 font-bold">
+                    Συμβουλή Πληκτρολογίου: Για να βάλεις τόνο σε ένα γράμμα στον υπολογιστή, πατάς πρώτα το πλήκτρο του τόνου (<span class="kbd-key text-xs">;</span> δίπλα στο Λ) και μετά το φωνήεν!
+                </p>
+            </div>
+        </section>
+
+        <!-- 2. ΟΘΟΝΗ ΠΑΙΧΝΙΔΙΟΥ -->
+        <section id="game-screen" class="hidden w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch">
+            
+            <!-- Αριστερή / Κύρια Κάρτα: Η Λέξη & τα Κουμπιά -->
+            <div id="word-card" class="lg:col-span-7 bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border-4 border-red-500 p-5 sm:p-8 flex flex-col justify-between relative overflow-hidden">
+                
+                <!-- Μπάρα Προόδου Γύρων -->
+                <div class="flex flex-col gap-2 mb-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-base font-extrabold text-slate-600">
+                        <div class="flex items-center gap-1.5">
+                            <span id="level-badge" class="bg-red-100 text-red-700 px-3 py-1 rounded-full">Επίπεδο: Εύκολο</span>
+                            <span class="bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 rounded-full text-xs sm:text-sm">
+                                ⌨️ Πληκτρολόγηση Λέξης
+                            </span>
+                        </div>
+                        <span id="round-counter" class="text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">Λέξη 1 από 10</span>
+                    </div>
+                    <div class="w-full bg-slate-200 h-3.5 rounded-full overflow-hidden p-0.5">
+                        <div id="progress-bar" class="bg-gradient-to-r from-emerald-500 via-amber-400 to-red-500 h-full rounded-full transition-all duration-500" style="width: 10%;"></div>
+                    </div>
+                </div>
+
+                <!-- Εικόνα & Οδηγία -->
+                <div class="text-center my-1 sm:my-2">
+                    <div id="word-emoji" class="text-6xl sm:text-7xl md:text-8xl mb-2 inline-block animate-float drop-shadow-md">
+                        🎄
+                    </div>
+                    <p id="instruction-text" class="text-sm sm:text-lg font-bold text-slate-600">
+                        Ξαναγράψε τη λέξη από το πληκτρολόγιο βάζοντας τον σωστό τόνο!
+                    </p>
+                </div>
+
+                <!-- Περιοχή Εμφάνισης Λέξης (Μόνο ανάγνωση - χωρίς κλικ με ποντίκι) -->
+                <div id="word-container" class="my-3 sm:my-4 py-5 px-4 bg-amber-50/90 border-2 border-dashed border-amber-300 rounded-2xl flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 min-h-[110px] sm:min-h-[130px] relative select-none">
+                    <!-- Τα γράμματα της άτονης λέξης εμφανίζονται εδώ -->
+                </div>
+
+                <!-- Περιοχή Πληκτρολόγησης Όλης της Λέξης με Τόνο -->
+                <div id="typing-mode-container" class="my-2 flex flex-col items-center gap-2.5">
+                    <div class="relative w-full max-w-md">
+                        <input type="text" id="word-type-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Γράψε τη λέξη με τόνο..." class="w-full text-center text-2xl sm:text-3xl font-extrabold tracking-wide text-slate-800 bg-white border-4 border-amber-400 focus:border-red-500 focus:outline-none rounded-2xl py-3 px-4 shadow-inner" />
+                    </div>
+                    <div class="flex flex-wrap items-center justify-center gap-2 text-xs sm:text-sm text-slate-600 font-bold">
+                        <span>Πάτησε <span class="kbd-key text-xs">;</span> + φωνήεν για τόνο, και μετά <span class="kbd-key text-xs">Enter ↵</span></span>
+                        <button type="button" id="check-word-btn" onclick="checkTypedWord()" class="bg-amber-400 hover:bg-amber-300 text-amber-950 font-extrabold px-4 py-1.5 rounded-xl border-b-2 border-amber-600 active:translate-y-0.5 transition">
+                            Έλεγχος ✓
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ένδειξη αναμονής τόνου (όταν ο μαθητής πατήσει ; ή ´) -->
+                <div id="dead-key-indicator" class="hidden text-center my-1">
+                    <span class="inline-flex items-center gap-1.5 bg-purple-100 text-purple-900 border-2 border-purple-400 px-3.5 py-1 rounded-full text-xs sm:text-sm font-extrabold animate-pulse">
+                        <span>´</span>
+                        <span>Έτοιμος ο τόνος! Τώρα πάτησε το φωνήεν (α, ε, η, ι, ο, υ, ω)...</span>
+                    </span>
+                </div>
+
+                <!-- Περιοχή Μηνύματος Ανατροφοδότησης & Κουμπί Επόμενης Λέξης -->
+                <div class="min-h-[72px] flex flex-col items-center justify-center text-center my-1">
+                    <div id="feedback-box" class="hidden px-5 py-2 rounded-2xl font-extrabold text-base sm:text-xl transition-all mb-2">
+                        <!-- Μήνυμα επιτυχίας ή προσπάθειας -->
+                    </div>
+                    
+                    <button id="next-btn" onclick="nextWord()" class="hidden bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-extrabold text-base sm:text-xl px-7 py-3 rounded-2xl shadow-lg border-b-4 border-green-800 transition transform hover:scale-105 active:translate-y-1 flex items-center gap-2">
+                        <span id="next-btn-text">Επόμενη Λέξη (Enter ↵)</span>
+                        <span>🎄</span>
+                    </button>
+                </div>
+
+                <!-- Εικονικός Οδηγός Πλήκτρων Πληκτρολογίου -->
+                <div id="keyboard-guide" class="mt-2 pt-3 border-t border-slate-200 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm text-slate-600 font-bold">
+                    <div class="flex items-center gap-1 bg-slate-100 px-2.5 py-1 rounded-xl border border-slate-200">
+                        <span id="key-vis-accent" class="kbd-key">;</span> + <span class="kbd-key">φωνήεν</span>
+                        <span>Βάζω τόνο</span>
+                    </div>
+                    <div class="flex items-center gap-1 bg-slate-100 px-2.5 py-1 rounded-xl border border-slate-200">
+                        <span class="kbd-key">Backspace ⌫</span>
+                        <span>Σβήνω γράμμα</span>
+                    </div>
+                    <div class="flex items-center gap-1 bg-slate-100 px-2.5 py-1 rounded-xl border border-slate-200">
+                        <span id="key-vis-enter" class="kbd-key">Enter ↵</span>
+                        <span>Έλεγχος / Επόμενη</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Δεξιά Κάρτα: Το Χριστουγεννιάτικο Δέντρο που στολίζεται -->
+            <div class="lg:col-span-5 bg-gradient-to-b from-slate-900/90 to-indigo-950/95 backdrop-blur-md rounded-3xl shadow-2xl border-4 border-amber-400/80 p-4 sm:p-6 flex flex-col items-center justify-between text-white">
+                <div class="text-center w-full">
+                    <h2 class="text-lg sm:text-2xl font-extrabold text-amber-300 flex items-center justify-center gap-2">
+                        <span>🎄</span>
+                        <span>Το Δέντρο μας</span>
+                        <span>🎄</span>
+                    </h2>
+                    <p id="tree-status" class="text-xs sm:text-sm text-indigo-200 font-semibold mt-1">
+                        Στολίδια: <span id="ornament-count" class="text-amber-300 font-extrabold text-base">0</span> / 10
+                    </p>
+                </div>
+
+                <!-- Διαδραστικό SVG Χριστουγεννιάτικο Δέντρο -->
+                <div class="w-full max-w-[270px] sm:max-w-[310px] my-2 flex-grow flex items-center justify-center">
+                    <svg id="christmas-tree-svg" viewBox="0 0 300 370" class="w-full h-auto drop-shadow-2xl">
+                        <!-- Χιόνι στη βάση -->
+                        <ellipse cx="150" cy="348" rx="115" ry="16" fill="#e2e8f0" opacity="0.9" />
+                        <ellipse cx="150" cy="346" rx="95" ry="11" fill="#ffffff" />
+                        
+                        <!-- Κορμός δέντρου -->
+                        <rect x="132" y="295" width="36" height="50" rx="6" fill="#78350f" stroke="#451a03" stroke-width="3" />
+                        
+                        <!-- Κάτω επίπεδο κλαδιών -->
+                        <path d="M 150 155 L 40 300 Q 150 320 260 300 Z" fill="#15803d" stroke="#14532d" stroke-width="3" stroke-linejoin="round" />
+                        <!-- Μεσαίο επίπεδο κλαδιών -->
+                        <path d="M 150 100 L 62 225 Q 150 242 238 225 Z" fill="#16a34a" stroke="#14532d" stroke-width="3" stroke-linejoin="round" />
+                        <!-- Πάνω επίπεδο κλαδιών -->
+                        <path d="M 150 48 L 86 150 Q 150 165 214 150 Z" fill="#22c55e" stroke="#14532d" stroke-width="3" stroke-linejoin="round" />
+
+                        <!-- Γιρλάντες (διακοσμητικές καμπύλες) -->
+                        <path d="M 105 130 Q 150 152 195 130" fill="none" stroke="#fde047" stroke-width="3" stroke-dasharray="6,5" opacity="0.7" />
+                        <path d="M 80 205 Q 150 232 220 205" fill="none" stroke="#fde047" stroke-width="3.5" stroke-dasharray="6,5" opacity="0.7" />
+                        <path d="M 58 280 Q 150 310 242 280" fill="none" stroke="#fde047" stroke-width="4" stroke-dasharray="7,5" opacity="0.7" />
+
+                        <!-- Δώρα κάτω από το δέντρο -->
+                        <g transform="translate(65, 315)">
+                            <rect x="0" y="0" width="32" height="26" rx="4" fill="#ef4444" stroke="#991b1b" stroke-width="2" />
+                            <rect x="13" y="0" width="6" height="26" fill="#facc15" />
+                            <rect x="0" y="10" width="32" height="6" fill="#facc15" />
+                        </g>
+                        <g transform="translate(202, 318)">
+                            <rect x="0" y="0" width="28" height="23" rx="4" fill="#3b82f6" stroke="#1e3a8a" stroke-width="2" />
+                            <rect x="11" y="0" width="6" height="23" fill="#f43f5e" />
+                            <rect x="0" y="9" width="28" height="5" fill="#f43f5e" />
+                        </g>
+
+                        <!-- Ομάδα όπου θα προστίθενται τα 10 στολίδια -->
+                        <g id="ornaments-layer"></g>
+                    </svg>
+                </div>
+
+                <!-- Μικρή μπάρα με τα 10 εικονίδια προόδου στολιδιών -->
+                <div id="ornament-slots" class="grid grid-cols-5 gap-2 w-full bg-white/10 p-2.5 rounded-2xl border border-white/15">
+                    <!-- Γεμίζει δυναμικά με 10 θέσεις -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. ΟΘΟΝΗ ΤΕΡΜΑΤΙΣΜΟΥ & ΕΠΑΙΝΟΣ -->
+        <section id="end-screen" class="hidden w-full max-w-2xl bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border-4 border-amber-400 p-6 sm:p-10 text-center">
+            <div class="text-6xl sm:text-7xl mb-3 animate-bounce">🏆🎄⭐</div>
+            
+            <h1 class="text-2xl sm:text-4xl font-extrabold text-red-700 mb-2">
+                Συγχαρητήρια!
+            </h1>
+            <p class="text-lg sm:text-xl font-bold text-emerald-700 mb-6">
+                Στόλισες όλο το Χριστουγεννιάτικο Δέντρο!
+            </p>
+
+            <!-- Κάρτα Επαίνου -->
+            <div class="bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100 border-4 border-double border-amber-400 rounded-2xl p-5 sm:p-7 mb-7 shadow-inner relative">
+                <div class="text-xs uppercase tracking-widest font-extrabold text-amber-700 mb-1">
+                    Επίσημος Χριστουγεννιάτικος Έπαινος
+                </div>
+                <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800 mb-2">
+                    «Αστέρι των Τόνων» 🌟
+                </h3>
+                <p class="text-sm sm:text-base text-slate-700 font-semibold mb-4">
+                    Απονέμεται για την εξαιρετική προσπάθεια στον τονισμό των λέξεων στο Εργαστήρι του Άγιου Βασίλη!
+                </p>
+                <div class="inline-flex items-center gap-4 bg-white px-5 py-2 rounded-full border border-amber-300 shadow-sm text-sm sm:text-base font-extrabold">
+                    <span class="text-emerald-600">✅ Στολίδια: 10/10</span>
+                    <span class="text-slate-300">|</span>
+                    <span id="final-accuracy" class="text-amber-600">🎯 Ακρίβεια: 100%</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                <button onclick="restartCurrentLevel()" class="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-extrabold text-lg px-7 py-3.5 rounded-2xl shadow-lg border-b-4 border-green-800 transition transform hover:-translate-y-0.5 active:translate-y-1">
+                    🔄 Παίξε ξανά
+                </button>
+                <button onclick="returnToMenu()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-extrabold text-lg px-7 py-3.5 rounded-2xl shadow-lg border-b-4 border-red-900 transition transform hover:-translate-y-0.5 active:translate-y-1">
+                    🎄 Αλλαγή Επιπέδου
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Υποσέλιδο -->
+    <footer class="relative z-10 text-center text-white/70 text-xs sm:text-sm py-3 px-4">
+        Εκπαιδευτικό παιχνίδι για μαθητές Β' Δημοτικού • Καλές Γιορτές! ❄️
+    </footer>
+
+    <script>
+        /**
+         * ΤΡΑΠΕΖΑ ΛΕΞΕΩΝ ΓΙΑ Β' ΔΗΜΟΤΙΚΟΥ (30 χριστουγεννιάτικες λέξεις)
+         * Κάθε αντικείμενο περιέχει:
+         * - plain: η λέξη χωρίς τόνο
+         * - accented: η σωστή τονισμένη λέξη
+         * - emoji: σχετική εικόνα
+         * - level: 'easy' (2-3 συλλαβές, απλά φωνήεντα) ή 'hard' (πολυσύλλαβες & δίψηφα φωνήεντα)
+         * - hint: προαιρετική μικρή βοήθεια
+         */
+        const WORDS_BANK = [
+            // --- ΕΥΚΟΛΟ ΕΠΙΠΕΔΟ (15 λέξεις) ---
+            { plain: "δεντρο", accented: "δέντρο", emoji: "🎄", level: "easy" },
+            { plain: "αστερι", accented: "αστέρι", emoji: "⭐", level: "easy" },
+            { plain: "δωρα", accented: "δώρα", emoji: "🎁", level: "easy" },
+            { plain: "ελατο", accented: "έλατο", emoji: "🌲", level: "easy" },
+            { plain: "αγαπη", accented: "αγάπη", emoji: "❤️", level: "easy" },
+            { plain: "καμπανα", accented: "καμπάνα", emoji: "🔔", level: "easy" },
+            { plain: "γλυκα", accented: "γλυκά", emoji: "🍬", level: "easy" },
+            { plain: "φατνη", accented: "φάτνη", emoji: "🛖", level: "easy" },
+            { plain: "αγγελος", accented: "άγγελος", emoji: "👼", level: "easy" },
+            { plain: "καλαντα", accented: "κάλαντα", emoji: "🎶", level: "easy" },
+            { plain: "ταρανδος", accented: "τάρανδος", emoji: "🦌", level: "easy" },
+            { plain: "κερι", accented: "κερί", emoji: "🕯️", level: "easy" },
+            { plain: "καλτσα", accented: "κάλτσα", emoji: "🧦", level: "easy" },
+            { plain: "μπαλα", accented: "μπάλα", emoji: "🔴", level: "easy" },
+            { plain: "ελκηθρο", accented: "έλκηθρο", emoji: "🛷", level: "easy" },
+
+            // --- ΠΡΟΧΩΡΗΜΕΝΟ ΕΠΙΠΕΔΟ (15 λέξεις - μεγαλύτερες & με δίψηφα φωνήεντα) ---
+            { plain: "χειμωνας", accented: "χειμώνας", emoji: "❄️", level: "hard" },
+            { plain: "χιονι", accented: "χιόνι", emoji: "🌨️", level: "hard" },
+            { plain: "χιονανθρωπος", accented: "χιονάνθρωπος", emoji: "⛄", level: "hard" },
+            { plain: "παιχνιδια", accented: "παιχνίδια", emoji: "🧸", level: "hard" },
+            { plain: "στολιδια", accented: "στολίδια", emoji: "✨", level: "hard" },
+            { plain: "μαγοι", accented: "μάγοι", emoji: "👑", level: "hard" },
+            { plain: "βασιλοπιτα", accented: "βασιλόπιτα", emoji: "🥧", level: "hard" },
+            { plain: "μελομακαρονα", accented: "μελομακάρονα", emoji: "🍪", level: "hard" },
+            { plain: "κουραμπιεδες", accented: "κουραμπιέδες", emoji: "🥟", level: "hard" },
+            { plain: "καμιναδα", accented: "καμινάδα", emoji: "🏠", level: "hard" },
+            { plain: "ξωτικο", accented: "ξωτικό", emoji: "🧝", level: "hard" },
+            { plain: "συννεφο", accented: "σύννεφο", emoji: "☁️", level: "hard" },
+            { plain: "ευχες", accented: "ευχές", emoji: "💌", level: "hard" },
+            { plain: "μουσικη", accented: "μουσική", emoji: "🎵", level: "hard" },
+            { plain: "φλουρι", accented: "φλουρί", emoji: "🪙", level: "hard" }
+        ];
+
+        // Ελληνικά φωνήεντα (απλά και τονισμένα)
+        const SIMPLE_VOWELS = ['α', 'ε', 'η', 'ι', 'ο', 'υ', 'ω'];
+        // Δίψηφα φωνήεντα που τονίζονται στο 2ο γράμμα (όταν δεν υπάρχει διαλυτικό)
+        const DIGRAPHS = ['αι', 'ει', 'οι', 'ου', 'αυ', 'ευ'];
+
+        // Χαρτογράφηση άτονων -> τονισμένων φωνηέντων
+        const ACCENT_MAP = {
+            'α': 'ά', 'ε': 'έ', 'η': 'ή', 'ι': 'ί', 'ο': 'ό', 'υ': 'ύ', 'ω': 'ώ'
+        };
+        const UNACCENT_MAP = {
+            'ά': 'α', 'έ': 'ε', 'ή': 'η', 'ί': 'ι', 'ό': 'ο', 'ύ': 'υ', 'ώ': 'ω'
+        };
+
+        // Ενθαρρυντικά μηνύματα για σωστές απαντήσεις
+        const PRAISE_MESSAGES = [
+            "Μπράβο! Τέλειος τονισμός! 🌟",
+            "Είσαι αστέρι! Κρέμασες ένα στολίδι! ✨",
+            "Φανταστικά! Ο Άγιος Βασίλης χαμογελά! 🎅",
+            "Υπέροχα! Το βρήκες αμέσως! 🎄",
+            "Σούπερ! Συνεχίζεις καταπληκτικά! 🎁"
+        ];
+
+        // Θέσεις και στυλ για τα 10 στολίδια πάνω στο SVG δέντρο
+        const TREE_ORNAMENTS = [
+            { x: 150, y: 278, type: 'ball', color: '#ef4444', emoji: '🔴' },
+            { x: 105, y: 265, type: 'ball', color: '#facc15', emoji: '🟡' },
+            { x: 195, y: 265, type: 'ball', color: '#3b82f6', emoji: '🔵' },
+            { x: 130, y: 215, type: 'bell', color: '#fbbf24', emoji: '🔔' },
+            { x: 175, y: 210, type: 'ball', color: '#ec4899', emoji: '🟣' },
+            { x: 95,  y: 198, type: 'candy', color: '#f43f5e', emoji: '🍬' },
+            { x: 205, y: 198, type: 'ball', color: '#a855f7', emoji: '🔮' },
+            { x: 150, y: 145, type: 'heart', color: '#ef4444', emoji: '❤️' },
+            { x: 122, y: 118, type: 'ball', color: '#38bdf8', emoji: '❄️' },
+            { x: 150, y: 38,  type: 'star', color: '#facc15', emoji: '⭐' } // Το 10ο είναι το μεγάλο αστέρι στην κορυφή!
+        ];
+
+        // Κατάσταση παιχνιδιού
+        let currentLevel = 'easy';
+        let gameWords = [];
+        let currentIndex = 0;
+        let ornamentsEarned = 0;
+        let totalAttempts = 0;
+        let wordSolved = false;
+        let soundEnabled = true;
+
+        // Κατάσταση πληκτρολόγησης λέξης
+        let currentTokens = [];
+        let inputDeadKeyAccent = false;
+
+        // Χαρτογράφηση αγγλικών πλήκτρων QWERTY σε ελληνικά φωνήεντα (ώστε να δουλεύει ακόμα κι αν το πληκτρολόγιο είναι γυρισμένο στα Αγγλικά!)
+        const KEY_TO_GREEK_VOWEL = {
+            'α': 'α', 'a': 'α', 'ά': 'α',
+            'ε': 'ε', 'e': 'ε', 'έ': 'ε',
+            'η': 'η', 'h': 'η', 'ή': 'η',
+            'ι': 'ι', 'i': 'ι', 'ί': 'ι',
+            'ο': 'ο', 'o': 'ο', 'ό': 'ο',
+            'υ': 'υ', 'y': 'υ', 'ύ': 'υ',
+            'ω': 'ω', 'v': 'ω', 'ώ': 'ω'
+        };
+
+        // Χαρτογράφηση QWERTY σε ελληνικά γράμματα για τη λειτουργία πληκτρολόγησης λέξης
+        const QWERTY_TO_GREEK = {
+            'a': 'α', 'b': 'β', 'g': 'γ', 'd': 'δ', 'e': 'ε', 'z': 'ζ', 'h': 'η', 'u': 'θ',
+            'i': 'ι', 'k': 'κ', 'l': 'λ', 'm': 'μ', 'n': 'ν', 'j': 'ξ', 'o': 'ο', 'p': 'π',
+            'r': 'ρ', 's': 'σ', 'w': 'ς', 't': 'τ', 'y': 'υ', 'f': 'φ', 'x': 'χ', 'c': 'ψ', 'v': 'ω'
+        };
+
+        /**
+         * ΣΥΣΤΗΜΑ ΗΧΟΥ (Web Audio API - χωρίς εξωτερικά αρχεία)
+         */
+        let audioCtx = null;
+
+        function initAudio() {
+            try {
+                if (!audioCtx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) {
+                        audioCtx = new AudioContext();
+                    }
+                }
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            } catch (e) {
+                console.warn('AudioContext not supported:', e);
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const iconEl = document.getElementById('sound-icon');
+            const labelEl = document.getElementById('sound-label');
+            if (soundEnabled) {
+                initAudio();
+                iconEl.textContent = '🔊';
+                labelEl.textContent = 'Ήχος: Ναι';
+                playClickSound();
+            } else {
+                iconEl.textContent = '🔇';
+                labelEl.textContent = 'Ήχος: Όχι';
+            }
+        }
+
+        function playTone(freq, type = 'sine', duration = 0.15, delay = 0, gainVal = 0.15) {
+            if (!soundEnabled || !audioCtx) return;
+            try {
+                const now = audioCtx.currentTime + delay;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, now);
+                gain.gain.setValueAtTime(gainVal, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + duration);
+            } catch (e) {}
+        }
+
+        function playClickSound() {
+            playTone(600, 'sine', 0.08, 0, 0.1);
+        }
+
+        function playSuccessSound() {
+            // Χαρούμενη χριστουγεννιάτικη συγχορδία
+            playTone(523.25, 'triangle', 0.25, 0, 0.18);    // C5
+            playTone(659.25, 'triangle', 0.25, 0.09, 0.18); // E5
+            playTone(783.99, 'triangle', 0.35, 0.18, 0.2);  // G5
+            playTone(1046.5, 'sine', 0.45, 0.27, 0.18);     // C6
+        }
+
+        function playWrongSound() {
+            playTone(220, 'sawtooth', 0.18, 0, 0.12);
+            playTone(185, 'sawtooth', 0.22, 0.12, 0.12);
+        }
+
+        function playVictoryFanfare() {
+            const notes = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5];
+            const times = [0, 0.12, 0.24, 0.38, 0.55, 0.70];
+            notes.forEach((n, idx) => {
+                playTone(n, 'triangle', 0.3, times[idx], 0.2);
+            });
+        }
+
+        /**
+         * ΑΝΑΛΥΣΗ ΛΕΞΗΣ ΣΕ ΤΜΗΜΑΤΑ (ΓΙΑ ΤΗΝ ΕΜΦΑΝΙΣΗ ΤΟΥ ΤΟΝΟΥ ΣΤΗΝ ΕΠΙΛΥΣΗ)
+         */
+        function tokenizeWord(wordObj) {
+            const plain = wordObj.plain;
+            const accented = wordObj.accented;
+            const tokens = [];
+            let i = 0;
+
+            while (i < plain.length) {
+                const twoPlain = plain.slice(i, i + 2);
+                const twoAccented = accented.slice(i, i + 2);
+
+                if (i + 1 < plain.length && DIGRAPHS.includes(twoPlain)) {
+                    const isCorrect = twoPlain !== twoAccented;
+                    tokens.push({
+                        text: twoPlain,
+                        accentedText: twoAccented,
+                        isCorrect: isCorrect
+                    });
+                    i += 2;
+                } else {
+                    const chPlain = plain[i];
+                    const chAccented = accented[i];
+                    const isCorrect = chPlain !== chAccented;
+                    tokens.push({
+                        text: chPlain,
+                        accentedText: chAccented,
+                        isCorrect: isCorrect
+                    });
+                    i += 1;
+                }
+            }
+            return tokens;
+        }
+
+        /**
+         * ΔΙΑΧΕΙΡΙΣΗ ΧΡΙΣΤΟΥΓΕΝΝΙΑΤΙΚΟΥ ΔΕΝΤΡΟΥ & ΣΤΟΛΙΔΙΩΝ
+         */
+        function resetTreeUI() {
+            const layer = document.getElementById('ornaments-layer');
+            if (layer) layer.innerHTML = '';
+
+            document.getElementById('ornament-count').textContent = '0';
+
+            const slotsContainer = document.getElementById('ornament-slots');
+            if (slotsContainer) {
+                slotsContainer.innerHTML = '';
+                for (let i = 0; i < 10; i++) {
+                    const slot = document.createElement('div');
+                    slot.id = `ornament-slot-${i}`;
+                    slot.className = 'h-9 sm:h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-base sm:text-lg opacity-40 transition-all';
+                    slot.textContent = i === 9 ? '⭐' : '⚪';
+                    slotsContainer.appendChild(slot);
+                }
+            }
+        }
+
+        function addOrnamentToTree(index) {
+            if (index < 0 || index >= TREE_ORNAMENTS.length) return;
+            const item = TREE_ORNAMENTS[index];
+            const layer = document.getElementById('ornaments-layer');
+            const svgNS = 'http://www.w3.org/2000/svg';
+
+            const g = document.createElementNS(svgNS, 'g');
+            g.setAttribute('class', 'ornament-pop');
+
+            if (item.type === 'star') {
+                // Μεγάλο χρυσό αστέρι στην κορυφή του δέντρου (10ο στολίδι)
+                const star = document.createElementNS(svgNS, 'polygon');
+                star.setAttribute('points', '150,14 157,30 175,32 161,44 165,61 150,52 135,61 139,44 125,32 143,30');
+                star.setAttribute('fill', '#facc15');
+                star.setAttribute('stroke', '#ca8a04');
+                star.setAttribute('stroke-width', '2.5');
+                star.setAttribute('class', 'star-glow');
+                g.appendChild(star);
+            } else {
+                // Κρεμαστή χριστουγεννιάτικη μπάλα / στολίδι
+                const hook = document.createElementNS(svgNS, 'line');
+                hook.setAttribute('x1', item.x);
+                hook.setAttribute('y1', item.y - 14);
+                hook.setAttribute('x2', item.x);
+                hook.setAttribute('y2', item.y - 8);
+                hook.setAttribute('stroke', '#fde047');
+                hook.setAttribute('stroke-width', '2');
+                g.appendChild(hook);
+
+                const circle = document.createElementNS(svgNS, 'circle');
+                circle.setAttribute('cx', item.x);
+                circle.setAttribute('cy', item.y);
+                circle.setAttribute('r', '11');
+                circle.setAttribute('fill', item.color);
+                circle.setAttribute('stroke', '#ffffff');
+                circle.setAttribute('stroke-width', '2');
+                g.appendChild(circle);
+
+                const shine = document.createElementNS(svgNS, 'circle');
+                shine.setAttribute('cx', item.x - 3.5);
+                shine.setAttribute('cy', item.y - 3.5);
+                shine.setAttribute('r', '2.5');
+                shine.setAttribute('fill', 'rgba(255,255,255,0.75)');
+                g.appendChild(shine);
+            }
+
+            layer.appendChild(g);
+
+            ornamentsEarned = index + 1;
+            document.getElementById('ornament-count').textContent = ornamentsEarned;
+
+            const slot = document.getElementById(`ornament-slot-${index}`);
+            if (slot) {
+                slot.textContent = item.emoji;
+                slot.className = 'h-9 sm:h-10 rounded-xl bg-amber-400/30 border-2 border-amber-300 flex items-center justify-center text-lg sm:text-xl opacity-100 scale-105 shadow-md transition-all';
+            }
+        }
+
+        function restartCurrentLevel() {
+            startGame(currentLevel);
+        }
+
+        function returnToMenu() {
+            playClickSound();
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('home-btn').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+
+        // Ανακάτεμα πίνακα (Fisher-Yates)
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Έναρξη παιχνιδιού
+        function startGame(level) {
+            initAudio();
+            playClickSound();
+            currentLevel = level;
+            currentIndex = 0;
+            ornamentsEarned = 0;
+            totalAttempts = 0;
+            inputDeadKeyAccent = false;
+
+            // Επιλογή 10 τυχαίων λέξεων για το επιλεγμένο επίπεδο
+            const filtered = WORDS_BANK.filter(w => w.level === level);
+            gameWords = shuffleArray(filtered).slice(0, 10);
+
+            // Ενημέρωση UI
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('home-btn').classList.remove('hidden');
+
+            document.getElementById('level-badge').textContent = 
+                level === 'easy' ? 'Επίπεδο: Εύκολο' : 'Επίπεδο: Προχωρημένο';
+
+            resetTreeUI();
+            renderCurrentWord();
+        }
+// ... existing code ... -->
+        // Εμφάνιση της τρέχουσας λέξης στην οθόνη (μόνο για ανάγνωση & πληκτρολόγηση)
+        function renderCurrentWord() {
+            wordSolved = false;
+            inputDeadKeyAccent = false;
+            document.getElementById('dead-key-indicator').classList.add('hidden');
+
+            const wordObj = gameWords[currentIndex];
+            currentTokens = tokenizeWord(wordObj);
+
+            // Ενημέρωση μπάρας προόδου
+            document.getElementById('round-counter').textContent = `Λέξη ${currentIndex + 1} από 10`;
+            document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / 10) * 100}%`;
+
+            // Ενημέρωση emoji και οδηγιών
+            const emojiEl = document.getElementById('word-emoji');
+            emojiEl.textContent = wordObj.emoji;
+            document.getElementById('instruction-text').textContent = 'Ξαναγράψε τη λέξη από το πληκτρολόγιο βάζοντας τον σωστό τόνο!';
+
+            // Απόκρυψη προηγούμενου feedback και κουμπιού επόμενης λέξης
+            const feedbackBox = document.getElementById('feedback-box');
+            feedbackBox.classList.add('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+
+            const typeInput = document.getElementById('word-type-input');
+            const checkBtn = document.getElementById('check-word-btn');
+            typeInput.value = '';
+            typeInput.disabled = false;
+            checkBtn.disabled = false;
+            setTimeout(() => typeInput.focus(), 50);
+
+            // Εμφάνιση της άτονης λέξης ως απλά γράμματα (χωρίς δυνατότητα κλικ με ποντίκι)
+            const container = document.getElementById('word-container');
+            container.innerHTML = '';
+
+            currentTokens.forEach((token, idx) => {
+                const span = document.createElement('span');
+                span.id = `word-token-${idx}`;
+                span.textContent = token.text;
+                span.className = 'text-slate-800 font-extrabold text-3xl sm:text-5xl md:text-6xl px-1 sm:px-1.5 py-1 rounded-xl transition-all';
+                container.appendChild(span);
+            });
+        }
+
+        // Οπτική αναλαμπή πλήκτρου στον οδηγό πληκτρολογίου
+        function flashKeyGuide(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.classList.add('key-active');
+            setTimeout(() => el.classList.remove('key-active'), 180);
+        }
+
+        // Επιτυχής επίλυση της λέξης από το πληκτρολόγιο
+        function solveCurrentWord() {
+            if (wordSolved) return;
+            wordSolved = true;
+            playSuccessSound();
+
+            const feedbackBox = document.getElementById('feedback-box');
+            const typeInput = document.getElementById('word-type-input');
+            const checkBtn = document.getElementById('check-word-btn');
+
+            typeInput.disabled = true;
+            checkBtn.disabled = true;
+            document.getElementById('dead-key-indicator').classList.add('hidden');
+
+            // Εμφάνιση του τόνου πάνω στη λέξη-υπόδειγμα με όμορφο εφέ
+            currentTokens.forEach((token, idx) => {
+                if (token.isCorrect) {
+                    const span = document.getElementById(`word-token-${idx}`);
+                    if (span) {
+                        span.innerHTML = `<span class="tone-appear">${token.accentedText}</span>`;
+                        span.classList.add('bg-emerald-500', 'text-white', 'px-3', 'shadow-md');
+                    }
+                }
+            });
+
+            // Ενθαρρυντικό μήνυμα
+            const randomPraise = PRAISE_MESSAGES[Math.floor(Math.random() * PRAISE_MESSAGES.length)];
+            feedbackBox.textContent = randomPraise;
+            feedbackBox.className = 'px-5 py-2.5 rounded-2xl font-extrabold text-base sm:text-xl bg-emerald-100 text-emerald-800 border-2 border-emerald-400 mb-3 shadow-sm';
+            feedbackBox.classList.remove('hidden');
+
+            // Κρέμασμα στολιδιού σιγά-σιγά στο χριστουγεννιάτικο δέντρο
+            addOrnamentToTree(currentIndex);
+
+            // Εκτόξευση χριστουγεννιάτικων αστεριών/κονφετί
+            burstCelebration();
+
+            // Εμφάνιση κουμπιού για την επόμενη λέξη
+            const nextBtn = document.getElementById('next-btn');
+            const nextBtnText = document.getElementById('next-btn-text');
+            nextBtnText.textContent = currentIndex === 9 ? 'Δες τον Έπαινό σου! (Enter ↵)' : 'Επόμενη Λέξη (Enter ↵)';
+            nextBtn.classList.remove('hidden');
+        }
+
+        // Έλεγχος πληκτρολογημένης λέξης (Αποκλειστικά μέσω πληκτρολογίου)
+        function checkTypedWord() {
+            if (wordSolved) {
+                nextWord();
+                return;
+            }
+            const wordObj = gameWords[currentIndex];
+            const inputEl = document.getElementById('word-type-input');
+            const typedRaw = inputEl.value.trim().toLowerCase();
+            const feedbackBox = document.getElementById('feedback-box');
+            const wordCard = document.getElementById('word-card');
+
+            if (!typedRaw) {
+                inputEl.focus();
+                return;
+            }
+
+            totalAttempts++;
+
+            if (typedRaw === wordObj.accented) {
+                solveCurrentWord();
+            } else {
+                playWrongSound();
+                wordCard.classList.remove('animate-shake');
+                void wordCard.offsetWidth;
+                wordCard.classList.add('animate-shake');
+
+                if (typedRaw === wordObj.plain) {
+                    feedbackBox.textContent = 'Έγραψες σωστά τα γράμματα, αλλά ξέχασες τον τόνο (;)! Δοκίμασε ξανά! ✍️';
+                } else {
+                    feedbackBox.textContent = `Κοντά έπεσες! Έγραψες «${typedRaw}». Πρόσεξε τα γράμματα και τον τόνο! 🎄`;
+                }
+                feedbackBox.className = 'px-5 py-2 rounded-2xl font-bold text-sm sm:text-lg bg-red-100 text-red-800 border-2 border-red-300 mb-2';
+                feedbackBox.classList.remove('hidden');
+                inputEl.focus();
+            }
+        }
+
+        // Υποστήριξη αυτόματης μετατροπής QWERTY & συνδυασμού ';' + φωνήεν μέσα στο πεδίο κειμένου
+        document.getElementById('word-type-input').addEventListener('keydown', function(e) {
+            if (wordSolved) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    flashKeyGuide('key-vis-enter');
+                    nextWord();
+                }
+                return;
+            }
+
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                flashKeyGuide('key-vis-enter');
+                checkTypedWord();
+                return;
+            }
+
+            // Αν ο μαθητής πατήσει ';' ή '´' στο πληκτρολόγιο (ελληνικό πλήκτρο τόνου)
+            if (e.key === ';' || e.key === '´' || e.key === 'Dead') {
+                e.preventDefault();
+                inputDeadKeyAccent = true;
+                document.getElementById('dead-key-indicator').classList.remove('hidden');
+                flashKeyGuide('key-vis-accent');
+                playClickSound();
+                return;
+            }
+
+            // Αν το πληκτρολόγιο είναι στα αγγλικά ή αν προηγήθηκε το πλήκτρο τόνου ';'
+            const lowerKey = e.key.toLowerCase();
+            if (lowerKey.length === 1 && (QWERTY_TO_GREEK[lowerKey] || KEY_TO_GREEK_VOWEL[lowerKey])) {
+                const greekChar = QWERTY_TO_GREEK[lowerKey] || lowerKey;
+                if (inputDeadKeyAccent && ACCENT_MAP[greekChar]) {
+                    e.preventDefault();
+                    this.value += ACCENT_MAP[greekChar];
+                    inputDeadKeyAccent = false;
+                    document.getElementById('dead-key-indicator').classList.add('hidden');
+                } else if (QWERTY_TO_GREEK[lowerKey]) {
+                    // Αυτόματη μετατροπή λατινικού χαρακτήρα σε ελληνικό για ευκολία των μαθητών
+                    e.preventDefault();
+                    this.value += greekChar;
+                    inputDeadKeyAccent = false;
+                    document.getElementById('dead-key-indicator').classList.add('hidden');
+                } else {
+                    inputDeadKeyAccent = false;
+                    document.getElementById('dead-key-indicator').classList.add('hidden');
+                }
+            } else if (e.key !== 'Shift' && e.key !== 'Backspace') {
+                inputDeadKeyAccent = false;
+                document.getElementById('dead-key-indicator').classList.add('hidden');
+            }
+        });
+
+        // Κεντρικός ακροατής πληκτρολογίου για όλο το παιχνίδι
+        document.addEventListener('keydown', function(e) {
+            const gameScreen = document.getElementById('game-screen');
+            const endScreen = document.getElementById('end-screen');
+
+            // Στην οθόνη τερματισμού: Enter για νέο παιχνίδι
+            if (!endScreen.classList.contains('hidden')) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    restartCurrentLevel();
+                }
+                return;
+            }
+
+            if (gameScreen.classList.contains('hidden')) return;
+
+            // Αν η λέξη έχει ήδη λυθεί: Enter ή Space προχωρά στην επόμενη λέξη
+            if (wordSolved) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    flashKeyGuide('key-vis-enter');
+                    nextWord();
+                }
+                return;
+            }
+
+            // Επαναφορά εστίασης στο πλαίσιο πληκτρολόγησης αν ο μαθητής αρχίσει να πληκτρολογεί
+            const typeInput = document.getElementById('word-type-input');
+            if (document.activeElement !== typeInput && !e.ctrlKey && !e.metaKey && !e.altKey && e.key.length === 1) {
+                typeInput.focus();
+            }
+        });
+
+        // Μετάβαση στην επόμενη λέξη ή στην οθόνη τερματισμού
+        function nextWord() {
+            playClickSound();
+            if (currentIndex < 9) {
+                currentIndex++;
+                renderCurrentWord();
+            } else {
+                showEndScreen();
+            }
+        }
+
+        // Εμφάνιση οθόνης τερματισμού με έπαινο
+        function showEndScreen() {
+            playVictoryFanfare();
+            burstCelebration(80);
+
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+
+            // Υπολογισμός ακρίβειας (10 σωστές / συνολικές προσπάθειες)
+            const accuracy = Math.min(100, Math.round((10 / Math.max(10, totalAttempts)) * 100));
+            document.getElementById('final-accuracy').textContent = `🎯 Ακρίβεια: ${accuracy}%`;
+        }
+
+        /**
+         * ΚΑΜΒΑΣ ΧΙΟΝΟΠΤΩΣΗΣ & ΕΟΡΤΑΣΤΙΚΩΝ ΚΟΝΦΕΤΙ
+         */
+        const canvas = document.getElementById('snow-canvas');
+        const ctx = canvas.getContext('2d');
+        let snowflakes = [];
+        let confettiParticles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Αρχικοποίηση νιφάδων χιονιού
+        function initSnow() {
+            snowflakes = [];
+            const count = Math.min(90, Math.floor(window.innerWidth / 15));
+            for (let i = 0; i < count; i++) {
+                snowflakes.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 3.5 + 1.5,
+                    speedY: Math.random() * 1.2 + 0.4,
+                    speedX: Math.random() * 0.6 - 0.3,
+                    opacity: Math.random() * 0.6 + 0.3
+                });
+            }
+        }
+
+        // Δημιουργία χριστουγεννιάτικων κονφετί / αστεριών
+        function burstCelebration(amount = 45) {
+            const colors = ['#facc15', '#ef4444', '#22c55e', '#38bdf8', '#f472b6', '#ffffff'];
+            for (let i = 0; i < amount; i++) {
+                confettiParticles.push({
+                    x: canvas.width / 2 + (Math.random() * 200 - 100),
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: (Math.random() - 0.8) * 14,
+                    size: Math.random() * 8 + 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rotation: Math.random() * 360,
+                    rotSpeed: (Math.random() - 0.5) * 10,
+                    life: 1.0
+                });
+            }
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Σχεδίαση νιφάδων χιονιού
+            snowflakes.forEach(flake => {
+                ctx.beginPath();
+                ctx.arc(flake.x, flake.y, flake.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${flake.opacity})`;
+                ctx.fill();
+
+                flake.y += flake.speedY;
+                flake.x += flake.speedX;
+
+                if (flake.y > canvas.height) {
+                    flake.y = -5;
+                    flake.x = Math.random() * canvas.width;
+                }
+                if (flake.x > canvas.width) flake.x = 0;
+                if (flake.x < 0) flake.x = canvas.width;
+            });
+
+            // Σχεδίαση κονφετί επιβράβευσης
+            for (let i = confettiParticles.length - 1; i >= 0; i--) {
+                const p = confettiParticles[i];
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate((p.rotation * Math.PI) / 180);
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+                ctx.restore();
+
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.32; // βαρύτητα
+                p.rotation += p.rotSpeed;
+                p.life -= 0.015;
+
+                if (p.life <= 0) {
+                    confettiParticles.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(animateCanvas);
+        }
+
+        window.onload = function() {
+            initSnow();
+            animateCanvas();
+        };
+    </script>
+</body>
+</html>
