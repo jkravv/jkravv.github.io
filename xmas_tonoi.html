@@ -982,10 +982,20 @@
             if (lowerKey.length === 1 && (QWERTY_TO_GREEK[lowerKey] || KEY_TO_GREEK_VOWEL[lowerKey])) {
                 const greekChar = QWERTY_TO_GREEK[lowerKey] || lowerKey;
                 if (inputDeadKeyAccent && ACCENT_MAP[greekChar]) {
-                    e.preventDefault();
-                    this.value += ACCENT_MAP[greekChar];
-                    inputDeadKeyAccent = false;
-                    document.getElementById('dead-key-indicator').classList.add('hidden');
+         e.preventDefault();
+
+    // Αφαίρεση τυχόν προηγούμενου τόνου
+    const cleanValue = this.value.normalize('NFD')
+        .replace(/[\u0301]/g, '')
+        .normalize('NFC');
+
+    // Προσθήκη ενός μόνο τονισμένου φωνήεντος
+    this.value = cleanValue + ACCENT_MAP[greekChar];
+
+    inputDeadKeyAccent = false;
+
+    document.getElementById('dead-key-indicator')
+        .classList.add('hidden');
                 } else if (QWERTY_TO_GREEK[lowerKey]) {
                     // Αυτόματη μετατροπή λατινικού χαρακτήρα σε ελληνικό για ευκολία των μαθητών
                     e.preventDefault();
